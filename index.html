@@ -1,0 +1,1755 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Finance Toolkit — Referensi &amp; Kalkulator Lengkap</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.css">
+<style>
+:root{
+  --bg:#0b1220;
+  --panel:#121b2e;
+  --panel-2:#17223a;
+  --text:#e4e9f5;
+  --muted:#8592b0;
+  --up:#45c4a0;
+  --down:#e2726e;
+  --gold:#e0ac4f;
+  --border:rgba(228,233,245,0.09);
+  --radius:10px;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  --sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --serif: ui-serif, Georgia, "Times New Roman", serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+body{padding-bottom:60px;}
+a{color:var(--up);}
+::selection{background:var(--gold);color:#0b1220;}
+
+/* focus visibility */
+a:focus-visible, button:focus-visible, input:focus-visible{
+  outline:2px solid var(--gold); outline-offset:2px;
+}
+
+/* ---- Ticker (signature element) ---- */
+.ticker-wrap{
+  background:#070c16;
+  border-bottom:1px solid var(--border);
+  overflow:hidden;
+  white-space:nowrap;
+  padding:9px 0;
+}
+.ticker-track{
+  display:inline-block;
+  white-space:nowrap;
+  animation:ticker-scroll 55s linear infinite;
+  font-family:var(--mono);
+  font-size:12.5px;
+  letter-spacing:.02em;
+  color:var(--muted);
+}
+.ticker-track span{ margin:0 22px; }
+.ticker-track span.g{color:var(--up);}
+.ticker-track span.a{color:var(--gold);}
+@keyframes ticker-scroll{
+  0%{transform:translateX(0);}
+  100%{transform:translateX(-50%);}
+}
+@media (prefers-reduced-motion: reduce){
+  .ticker-track{ animation:none; }
+}
+
+/* ---- Header ---- */
+header.brand{
+  padding:26px 22px 18px;
+  max-width:1180px;
+  margin:0 auto;
+}
+header.brand h1{
+  font-family:var(--serif);
+  font-weight:600;
+  font-size:clamp(22px,4vw,32px);
+  margin:0 0 6px;
+  letter-spacing:.01em;
+}
+header.brand h1 em{
+  color:var(--up); font-style:normal; border-bottom:2px solid var(--up);
+}
+header.brand p{
+  margin:0; color:var(--muted); font-size:14.5px; max-width:640px; line-height:1.5;
+}
+
+/* ---- Category tabs ---- */
+nav.cat-tabs{
+  position:sticky; top:0; z-index:20;
+  background:rgba(11,18,32,0.92);
+  backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--border);
+  display:flex; gap:6px; overflow-x:auto;
+  padding:10px 22px;
+  scrollbar-width:thin;
+}
+nav.cat-tabs::-webkit-scrollbar{height:5px;}
+nav.cat-tabs::-webkit-scrollbar-thumb{background:var(--panel-2);border-radius:4px;}
+.cat-tab{
+  flex:none;
+  font-family:var(--mono);
+  font-size:12.5px;
+  letter-spacing:.03em;
+  text-transform:uppercase;
+  color:var(--muted);
+  background:transparent;
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:8px 14px;
+  cursor:pointer;
+  transition:background .15s, color .15s, border-color .15s;
+  white-space:nowrap;
+}
+.cat-tab:hover{ color:var(--text); border-color:var(--muted); }
+.cat-tab.active{
+  color:#08131a; background:var(--up); border-color:var(--up); font-weight:600;
+}
+
+/* ---- Topic pill sub-nav ---- */
+.topic-pills{
+  max-width:1180px; margin:0 auto;
+  display:flex; gap:8px; flex-wrap:wrap;
+  padding:16px 22px 4px;
+}
+.topic-pill{
+  font-family:var(--mono); font-size:12.5px;
+  color:var(--muted); background:var(--panel);
+  border:1px solid var(--border); border-radius:7px;
+  padding:7px 11px; cursor:pointer;
+  transition:border-color .15s, color .15s;
+}
+.topic-pill .code{ color:var(--gold); margin-right:6px; }
+.topic-pill:hover{ color:var(--text); border-color:var(--muted); }
+.topic-pill.active{ color:var(--text); border-color:var(--up); box-shadow:inset 0 0 0 1px var(--up); }
+
+/* ---- Main content ---- */
+main#content{
+  max-width:1180px; margin:0 auto; padding:10px 22px 40px;
+}
+.topic-section{ display:none; animation:fadein .25s ease; }
+.topic-section.active{ display:block; }
+@keyframes fadein{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;} }
+@media (prefers-reduced-motion: reduce){ .topic-section{animation:none;} }
+
+.section-head{ margin-bottom:18px; }
+.code-badge{
+  display:inline-block; font-family:var(--mono); font-size:12px; color:var(--gold);
+  border:1px solid rgba(224,172,79,.35); border-radius:5px; padding:2px 7px; margin-bottom:10px;
+  letter-spacing:.04em;
+}
+.section-head h2{
+  font-family:var(--serif); font-size:24px; margin:0 0 8px; font-weight:600;
+}
+.section-head p.intro{ color:var(--muted); margin:0; line-height:1.55; font-size:14.5px; max-width:760px; }
+
+.formula-card{
+  background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+  padding:16px 18px; margin:16px 0 22px;
+}
+.formula-card .f-label{
+  font-family:var(--mono); font-size:11.5px; color:var(--muted); text-transform:uppercase;
+  letter-spacing:.05em; margin:14px 0 4px;
+}
+.formula-card .f-label:first-child{ margin-top:0; }
+.formula-card .f-note{ font-size:13px; color:var(--muted); margin:4px 0 0; }
+.formula-card .katex-display{ margin:6px 0; overflow-x:auto; overflow-y:hidden; }
+.formula-card{ overflow-x:auto; }
+
+.calc-grid{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr));
+  gap:14px; margin-bottom:10px;
+}
+.calc-card{
+  background:var(--panel-2); border:1px solid var(--border); border-radius:var(--radius);
+  padding:15px 16px; transition:transform .15s, border-color .15s;
+}
+.calc-card:hover{ border-color:rgba(228,233,245,.18); }
+.calc-card h4{
+  font-family:var(--mono); font-size:13px; margin:0 0 12px; color:var(--text);
+  font-weight:600; letter-spacing:.01em;
+}
+.field{ margin-bottom:9px; }
+.field label{
+  display:block; font-size:11.5px; color:var(--muted); margin-bottom:3px; font-family:var(--mono);
+}
+.field input, .field select, .field textarea{
+  width:100%; background:#0c1424; color:var(--text); border:1px solid var(--border);
+  border-radius:6px; padding:7px 9px; font-family:var(--mono); font-size:13px;
+}
+.field textarea{ resize:vertical; min-height:44px; }
+.field input:focus, .field select:focus, .field textarea:focus{ border-color:var(--up); outline:none; }
+.btn{
+  margin-top:4px; background:var(--up); color:#08131a; border:none; border-radius:6px;
+  padding:8px 14px; font-family:var(--mono); font-size:12.5px; font-weight:700;
+  cursor:pointer; letter-spacing:.02em; transition:filter .15s;
+}
+.btn:hover{ filter:brightness(1.08); }
+.btn.secondary{ background:transparent; color:var(--up); border:1px solid var(--up); }
+.result{
+  margin-top:10px; font-family:var(--mono); font-size:13px; color:var(--gold);
+  border-top:1px dashed var(--border); padding-top:8px; min-height:18px; line-height:1.5;
+  white-space:pre-line;
+}
+.result:empty{ padding-top:0; border-top:none; }
+.path-chart{ width:100%; height:auto; margin-top:8px; border-radius:6px; background:#0c1424; }
+.path-chart polyline{ stroke:var(--up); }
+
+.two-col{ display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+@media (max-width:520px){ .two-col{ grid-template-columns:1fr; } }
+
+footer.credits{
+  max-width:1180px; margin:30px auto 0; padding:16px 22px; color:var(--muted);
+  font-size:12px; border-top:1px solid var(--border);
+}
+</style>
+</head>
+<body>
+
+<div class="ticker-wrap"><div class="ticker-track" id="tickerTrack"></div></div>
+
+<header class="brand">
+  <h1>Quant Finance <em>Toolkit</em></h1>
+  <p>Referensi rumus lengkap + kalkulator interaktif untuk 19 topik quant finance — dari credit risk sampai kalkulus stokastik. Pilih kategori, lalu topik, lalu masukkan angka Anda.</p>
+</header>
+
+<nav class="cat-tabs" id="catTabs"></nav>
+<div class="topic-pills" id="topicPills"></div>
+
+<main id="content">
+<!-- ================= CATEGORY A: FUNDAMENTAL ================= -->
+
+<section class="topic-section" id="sec-A1" data-cat="A">
+  <div class="section-head">
+    <span class="code-badge">A1 · CREDIT</span>
+    <h2>Credit Risk &amp; Spreads</h2>
+    <p class="intro">Selisih yield antara obligasi korporasi dan treasury mencerminkan kompensasi atas risiko gagal bayar (default risk).</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Credit Spread</div>
+    \[ \text{Spread} = y_{\text{corporate}} - y_{\text{treasury}} \]
+    <div class="f-label">Default Probability (aproksimasi)</div>
+    \[ P(\text{default}) \approx \frac{\text{Spread}}{1 - \text{Recovery Rate}} \]
+    <p class="f-note">Recovery rate biasanya 30–40% untuk senior debt.</p>
+    <div class="f-label">Z-Spread</div>
+    \[ P = \sum_{t} \frac{CF_t}{(1 + r_t + z)^t} \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Hitung Credit Spread</h4>
+      <div class="field"><label>Yield Korporasi (%)</label><input type="number" id="a1-corp" value="6.5" step="0.01"></div>
+      <div class="field"><label>Yield Treasury (%)</label><input type="number" id="a1-tsy" value="4.3" step="0.01"></div>
+      <button class="btn" onclick="calcA1Spread()">Hitung</button>
+      <div class="result" id="a1-spread-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② Estimasi Probabilitas Default</h4>
+      <div class="field"><label>Credit Spread (%)</label><input type="number" id="a1-dp-spread" value="2.2" step="0.01"></div>
+      <div class="field"><label>Recovery Rate (%)</label><input type="number" id="a1-dp-recovery" value="40" step="1"></div>
+      <button class="btn" onclick="calcA1DefaultProb()">Hitung</button>
+      <div class="result" id="a1-dp-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>③ Harga Obligasi dengan Z-Spread</h4>
+      <div class="field"><label>Face Value</label><input type="number" id="a1-zs-face" value="1000" step="1"></div>
+      <div class="field"><label>Kupon Tahunan (%)</label><input type="number" id="a1-zs-coupon" value="5" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>Spot Rate r (%)</label><input type="number" id="a1-zs-r" value="4" step="0.01"></div>
+        <div class="field"><label>Z-Spread (bps)</label><input type="number" id="a1-zs-z" value="150" step="1"></div>
+      </div>
+      <div class="field"><label>Jumlah Periode (n)</label><input type="number" id="a1-zs-n" value="5" step="1"></div>
+      <button class="btn" onclick="calcA1ZSpread()">Hitung</button>
+      <div class="result" id="a1-zs-result"></div>
+      <p class="f-note">Asumsi kurva spot rate flat sebesar r di semua tenor.</p>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-A2" data-cat="A">
+  <div class="section-head">
+    <span class="code-badge">A2 · EQUITY</span>
+    <h2>Equity Markets: Valuasi Saham</h2>
+    <p class="intro">Tiga pendekatan umum untuk menilai harga wajar saham: model dividen, model arus kas bebas, dan pendekatan multiples relatif.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Dividend Discount Model (Gordon Growth)</div>
+    \[ P_0 = \frac{D_1}{r - g} \]
+    <div class="f-label">Free Cash Flow Valuation</div>
+    \[ P_0 = \sum_{t=1}^{\infty} \frac{FCF_t}{(1 + WACC)^t} \]
+    <div class="f-label">Multiples</div>
+    \[ P/E = \frac{\text{Price}}{\text{EPS}}, \quad P/B = \frac{\text{Price}}{\text{Book Value}}, \quad EV/EBITDA = \frac{EV}{EBITDA} \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Gordon Growth Model</h4>
+      <div class="field"><label>Dividen Tahun Depan D₁</label><input type="number" id="a2-ggm-d1" value="2.5" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>Required Return r (%)</label><input type="number" id="a2-ggm-r" value="9" step="0.01"></div>
+        <div class="field"><label>Growth g (%)</label><input type="number" id="a2-ggm-g" value="4" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcA2GGM()">Hitung P₀</button>
+      <div class="result" id="a2-ggm-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② FCF Valuation (single-stage)</h4>
+      <div class="field"><label>FCF Tahun Depan</label><input type="number" id="a2-fcf-fcf1" value="120" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>WACC (%)</label><input type="number" id="a2-fcf-wacc" value="10" step="0.01"></div>
+        <div class="field"><label>Growth g (%)</label><input type="number" id="a2-fcf-g" value="3" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcA2FCF()">Hitung P₀</button>
+      <div class="result" id="a2-fcf-result"></div>
+      <p class="f-note">Versi perpetuity-growth (satu tahap) dari rumus deret tak hingga di atas.</p>
+    </div>
+
+    <div class="calc-card">
+      <h4>③ Multiples</h4>
+      <div class="two-col">
+        <div class="field"><label>Price</label><input type="number" id="a2-mult-price" value="50" step="0.01"></div>
+        <div class="field"><label>EPS</label><input type="number" id="a2-mult-eps" value="4" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Book Value/Share</label><input type="number" id="a2-mult-bv" value="22" step="0.01"></div>
+        <div class="field"><label>EV</label><input type="number" id="a2-mult-ev" value="800" step="0.01"></div>
+      </div>
+      <div class="field"><label>EBITDA</label><input type="number" id="a2-mult-ebitda" value="95" step="0.01"></div>
+      <button class="btn" onclick="calcA2Multiples()">Hitung Semua</button>
+      <div class="result" id="a2-mult-result"></div>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-A3" data-cat="A">
+  <div class="section-head">
+    <span class="code-badge">A3 · RATIOS</span>
+    <h2>Key Financial Ratios</h2>
+    <p class="intro">Rasio keuangan inti untuk membaca profitabilitas, likuiditas, leverage, dan efisiensi perusahaan — plus dekomposisi DuPont untuk ROE.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Profitabilitas</div>
+    \[ ROE = \frac{\text{Net Income}}{\text{Equity}}, \quad ROA = \frac{\text{Net Income}}{\text{Assets}}, \quad \text{Profit Margin} = \frac{\text{Net Income}}{\text{Revenue}} \]
+    <div class="f-label">Likuiditas</div>
+    \[ \text{Current Ratio} = \frac{CA}{CL}, \quad \text{Quick Ratio} = \frac{CA - \text{Inventory}}{CL} \]
+    <div class="f-label">Leverage</div>
+    \[ D/E = \frac{\text{Debt}}{\text{Equity}}, \quad \text{Interest Coverage} = \frac{EBIT}{\text{Interest}} \]
+    <div class="f-label">Efisiensi</div>
+    \[ \text{Asset Turnover} = \frac{\text{Sales}}{\text{Assets}}, \quad \text{Inventory Turnover} = \frac{COGS}{\text{Avg Inventory}} \]
+    <div class="f-label">DuPont Decomposition</div>
+    \[ ROE = \frac{NI}{\text{Sales}} \times \frac{\text{Sales}}{\text{Assets}} \times \frac{\text{Assets}}{\text{Equity}} \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Profitabilitas</h4>
+      <div class="field"><label>Net Income</label><input type="number" id="a3-p-ni" value="150" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>Equity</label><input type="number" id="a3-p-eq" value="900" step="0.01"></div>
+        <div class="field"><label>Assets</label><input type="number" id="a3-p-assets" value="2000" step="0.01"></div>
+      </div>
+      <div class="field"><label>Revenue</label><input type="number" id="a3-p-rev" value="1300" step="0.01"></div>
+      <button class="btn" onclick="calcA3Profit()">Hitung</button>
+      <div class="result" id="a3-p-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② Likuiditas</h4>
+      <div class="field"><label>Current Assets (CA)</label><input type="number" id="a3-l-ca" value="500" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>Current Liab. (CL)</label><input type="number" id="a3-l-cl" value="260" step="0.01"></div>
+        <div class="field"><label>Inventory</label><input type="number" id="a3-l-inv" value="120" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcA3Liquidity()">Hitung</button>
+      <div class="result" id="a3-l-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>③ Leverage</h4>
+      <div class="two-col">
+        <div class="field"><label>Debt</label><input type="number" id="a3-lev-debt" value="700" step="0.01"></div>
+        <div class="field"><label>Equity</label><input type="number" id="a3-lev-eq" value="900" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>EBIT</label><input type="number" id="a3-lev-ebit" value="220" step="0.01"></div>
+        <div class="field"><label>Interest</label><input type="number" id="a3-lev-int" value="45" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcA3Leverage()">Hitung</button>
+      <div class="result" id="a3-lev-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>④ Efisiensi</h4>
+      <div class="two-col">
+        <div class="field"><label>Sales</label><input type="number" id="a3-e-sales" value="1300" step="0.01"></div>
+        <div class="field"><label>Assets</label><input type="number" id="a3-e-assets" value="2000" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>COGS</label><input type="number" id="a3-e-cogs" value="780" step="0.01"></div>
+        <div class="field"><label>Avg Inventory</label><input type="number" id="a3-e-avginv" value="110" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcA3Efficiency()">Hitung</button>
+      <div class="result" id="a3-e-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>⑤ DuPont Decomposition</h4>
+      <div class="field"><label>Net Income</label><input type="number" id="a3-dp-ni" value="150" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>Sales</label><input type="number" id="a3-dp-sales" value="1300" step="0.01"></div>
+        <div class="field"><label>Assets</label><input type="number" id="a3-dp-assets" value="2000" step="0.01"></div>
+      </div>
+      <div class="field"><label>Equity</label><input type="number" id="a3-dp-equity" value="900" step="0.01"></div>
+      <button class="btn" onclick="calcA3DuPont()">Hitung ROE</button>
+      <div class="result" id="a3-dp-result"></div>
+    </div>
+  </div>
+</section>
+<!-- ================= CATEGORY B: STATISTIK & EKONOMETRIKA ================= -->
+
+<section class="topic-section" id="sec-B1" data-cat="B">
+  <div class="section-head">
+    <span class="code-badge">B1 · REGRESSION</span>
+    <h2>Regression Analysis</h2>
+    <p class="intro">Masukkan dua deret data (X, Y) dan kalkulator akan menghitung estimator OLS serta R² secara langsung.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Simple Linear Regression</div>
+    \[ Y = \alpha + \beta X + \epsilon \]
+    <div class="f-label">OLS Estimators</div>
+    \[ \beta = \frac{\text{Cov}(X,Y)}{\text{Var}(X)}, \quad \alpha = \bar{Y} - \beta \bar{X} \]
+    <div class="f-label">Multiple Regression (Matrix Form)</div>
+    \[ Y = \beta_0 + \beta_1 X_1 + \cdots + \beta_k X_k + \epsilon, \qquad \hat{\beta} = (X'X)^{-1}X'Y \]
+    <div class="f-label">R² (Goodness of Fit)</div>
+    \[ R^2 = 1 - \frac{SS_{\text{res}}}{SS_{\text{tot}}} \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card" style="grid-column:1/-1;">
+      <h4>① OLS dari Data (X, Y)</h4>
+      <div class="two-col">
+        <div class="field"><label>Data X (pisahkan dengan koma)</label><textarea id="b1-x">1,2,3,4,5,6,7,8</textarea></div>
+        <div class="field"><label>Data Y (pisahkan dengan koma)</label><textarea id="b1-y">2.1,3.9,6.2,7.8,10.1,12.3,13.9,16.2</textarea></div>
+      </div>
+      <button class="btn" onclick="calcB1OLS()">Hitung Regresi</button>
+      <div class="result" id="b1-result"></div>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-B2" data-cat="B">
+  <div class="section-head">
+    <span class="code-badge">B2 · HYPOTHESIS</span>
+    <h2>Hypothesis Testing</h2>
+    <p class="intro">Uji signifikansi rata-rata sampel terhadap nilai hipotesis menggunakan t-statistic.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">t-test (perbandingan rata-rata)</div>
+    \[ t = \frac{\bar{X} - \mu_0}{s/\sqrt{n}} \]
+    <div class="f-label">F-test</div>
+    <p class="f-note">Digunakan untuk membandingkan varians atau menguji signifikansi keseluruhan model regresi.</p>
+    <div class="f-label">Error Tipe I &amp; II</div>
+    <p class="f-note">Tipe I: <em>P(Tipe I) = α</em> — menolak H₀ padahal benar (false positive). Tipe II: gagal menolak H₀ padahal salah (false negative).</p>
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① t-statistic</h4>
+      <div class="field"><label>Rata-rata Sampel (X̄)</label><input type="number" id="b2-xbar" value="5.4" step="0.01"></div>
+      <div class="field"><label>Rata-rata Hipotesis (μ₀)</label><input type="number" id="b2-mu0" value="5" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>Std. Dev Sampel (s)</label><input type="number" id="b2-s" value="1.2" step="0.01"></div>
+        <div class="field"><label>n (jumlah sampel)</label><input type="number" id="b2-n" value="36" step="1"></div>
+      </div>
+      <button class="btn" onclick="calcB2Ttest()">Hitung t</button>
+      <div class="result" id="b2-result"></div>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-B3" data-cat="B">
+  <div class="section-head">
+    <span class="code-badge">B3 · PROBABILITY</span>
+    <h2>Essential Probability &amp; Statistics</h2>
+    <p class="intro">Distribusi normal, Central Limit Theorem, dan statistik deskriptif (mean, variance, skewness, kurtosis).</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Distribusi Normal</div>
+    \[ X \sim N(\mu, \sigma^2) \]
+    <div class="f-label">Central Limit Theorem</div>
+    \[ \bar{X}_n \xrightarrow{d} N\left(\mu, \frac{\sigma^2}{n}\right) \]
+    <div class="f-label">Mean &amp; Variance</div>
+    \[ \mu = E[X], \qquad \sigma^2 = E[(X-\mu)^2] \]
+    <div class="f-label">Skewness &amp; Kurtosis</div>
+    \[ \gamma = \frac{E[(X-\mu)^3]}{\sigma^3}, \qquad \kappa = \frac{E[(X-\mu)^4]}{\sigma^4} \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Z-score &amp; Probabilitas Kumulatif</h4>
+      <div class="field"><label>Nilai X</label><input type="number" id="b3-z-x" value="115" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>Mean (μ)</label><input type="number" id="b3-z-mu" value="100" step="0.01"></div>
+        <div class="field"><label>Std Dev (σ)</label><input type="number" id="b3-z-sigma" value="15" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcB3Zscore()">Hitung</button>
+      <div class="result" id="b3-z-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② Central Limit Theorem</h4>
+      <div class="field"><label>Mean Populasi (μ)</label><input type="number" id="b3-clt-mu" value="100" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>Std Dev Populasi (σ)</label><input type="number" id="b3-clt-sigma" value="15" step="0.01"></div>
+        <div class="field"><label>Ukuran Sampel (n)</label><input type="number" id="b3-clt-n" value="36" step="1"></div>
+      </div>
+      <button class="btn" onclick="calcB3CLT()">Hitung Distribusi X̄</button>
+      <div class="result" id="b3-clt-result"></div>
+    </div>
+
+    <div class="calc-card" style="grid-column:1/-1;">
+      <h4>③ Statistik Deskriptif dari Data</h4>
+      <div class="field"><label>Data (pisahkan dengan koma)</label><textarea id="b3-data">4.2,5.1,3.8,6.0,4.9,5.5,4.4,7.1,3.9,5.0</textarea></div>
+      <button class="btn" onclick="calcB3Descriptive()">Hitung Mean / Var / Skew / Kurtosis</button>
+      <div class="result" id="b3-desc-result"></div>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-B4" data-cat="B">
+  <div class="section-head">
+    <span class="code-badge">B4 · TIME SERIES</span>
+    <h2>Time Series Analysis</h2>
+    <p class="intro">Random walk, model AR/MA, dan GARCH(1,1) untuk memodelkan volatilitas yang berubah seiring waktu.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Random Walk</div>
+    \[ S_t = S_{t-1} + \epsilon_t \]
+    <div class="f-label">AR(p) — Autoregressive</div>
+    \[ X_t = c + \sum_{i=1}^p \phi_i X_{t-i} + \epsilon_t \]
+    <div class="f-label">MA(q) — Moving Average</div>
+    \[ X_t = \mu + \epsilon_t + \sum_{i=1}^q \theta_i \epsilon_{t-i} \]
+    <div class="f-label">GARCH(1,1)</div>
+    \[ \sigma_t^2 = \omega + \alpha \epsilon_{t-1}^2 + \beta \sigma_{t-1}^2 \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Simulasi Random Walk</h4>
+      <div class="field"><label>S₀ (nilai awal)</label><input type="number" id="b4-rw-s0" value="100" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>σ per langkah</label><input type="number" id="b4-rw-sigma" value="1.5" step="0.01"></div>
+        <div class="field"><label>Jumlah Langkah</label><input type="number" id="b4-rw-n" value="150" step="1"></div>
+      </div>
+      <button class="btn" onclick="simB4RandomWalk()">Simulasikan</button>
+      <div class="result" id="b4-rw-result"></div>
+      <div id="b4-rw-chart"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② Forecast AR(1)</h4>
+      <div class="field"><label>Konstanta (c)</label><input type="number" id="b4-ar-c" value="0.5" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>φ₁</label><input type="number" id="b4-ar-phi" value="0.7" step="0.01"></div>
+        <div class="field"><label>X (t-1)</label><input type="number" id="b4-ar-xprev" value="4.2" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcB4AR()">Hitung X_t</button>
+      <div class="result" id="b4-ar-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>③ Forecast MA(1)</h4>
+      <div class="field"><label>μ</label><input type="number" id="b4-ma-mu" value="0" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>θ₁</label><input type="number" id="b4-ma-theta" value="0.4" step="0.01"></div>
+        <div class="field"><label>ε (t-1)</label><input type="number" id="b4-ma-eprev" value="1.1" step="0.01"></div>
+      </div>
+      <div class="field"><label>ε (t, shock saat ini)</label><input type="number" id="b4-ma-enow" value="0.3" step="0.01"></div>
+      <button class="btn" onclick="calcB4MA()">Hitung X_t</button>
+      <div class="result" id="b4-ma-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>④ GARCH(1,1) — Variance Berikutnya</h4>
+      <div class="field"><label>ω (omega)</label><input type="number" id="b4-g-omega" value="0.00001" step="0.000001"></div>
+      <div class="two-col">
+        <div class="field"><label>α (alpha)</label><input type="number" id="b4-g-alpha" value="0.08" step="0.01"></div>
+        <div class="field"><label>β (beta)</label><input type="number" id="b4-g-beta" value="0.9" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>ε²(t-1)</label><input type="number" id="b4-g-e2" value="0.0002" step="0.00001"></div>
+        <div class="field"><label>σ²(t-1)</label><input type="number" id="b4-g-s2" value="0.00018" step="0.00001"></div>
+      </div>
+      <button class="btn" onclick="calcB4GARCH()">Hitung σ²_t</button>
+      <div class="result" id="b4-g-result"></div>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-B5" data-cat="B">
+  <div class="section-head">
+    <span class="code-badge">B5 · CORRELATION</span>
+    <h2>Correlation &amp; Covariance</h2>
+    <p class="intro">Ukuran hubungan linear antar dua variabel — dasar dari diversifikasi portofolio pada bagian MPT.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Covariance</div>
+    \[ \text{Cov}(X,Y) = E[(X-\mu_X)(Y-\mu_Y)] = E[XY] - E[X]E[Y] \]
+    <div class="f-label">Correlation</div>
+    \[ \rho_{X,Y} = \frac{\text{Cov}(X,Y)}{\sigma_X \sigma_Y} \in [-1, 1] \]
+    <div class="f-label">Correlation Matrix</div>
+    \[ \Sigma_{ij} = \rho_{ij}\sigma_i \sigma_j \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card" style="grid-column:1/-1;">
+      <h4>① Covariance &amp; Correlation dari Data</h4>
+      <div class="two-col">
+        <div class="field"><label>Data X (pisahkan dengan koma)</label><textarea id="b5-x">2.1,3.4,1.8,4.0,2.9,3.6,2.2</textarea></div>
+        <div class="field"><label>Data Y (pisahkan dengan koma)</label><textarea id="b5-y">7.2,8.9,6.5,9.8,8.0,9.1,7.0</textarea></div>
+      </div>
+      <button class="btn" onclick="calcB5CovCorr()">Hitung</button>
+      <div class="result" id="b5-result"></div>
+    </div>
+  </div>
+</section>
+<!-- ================= CATEGORY C: FIXED INCOME & TVM ================= -->
+
+<section class="topic-section" id="sec-C1" data-cat="C">
+  <div class="section-head">
+    <span class="code-badge">C1 · TVM</span>
+    <h2>Time Value of Money</h2>
+    <p class="intro">Fondasi seluruh valuasi keuangan: nilai uang hari ini berbeda dengan nilai uang di masa depan.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Present Value (diskrit &amp; kontinu)</div>
+    \[ PV = \frac{FV}{(1+r)^n} \qquad PV = FV \cdot e^{-rt} \]
+    <div class="f-label">Future Value (diskrit &amp; kontinu)</div>
+    \[ FV = PV(1+r)^n \qquad FV = PV \cdot e^{rt} \]
+    <div class="f-label">PV Annuity</div>
+    \[ PV_{\text{annuity}} = C \cdot \frac{1-(1+r)^{-n}}{r} \]
+    <div class="f-label">PV Perpetuity</div>
+    \[ PV_{\text{perpetuity}} = \frac{C}{r} \]
+    <div class="f-label">Effective Annual Rate</div>
+    \[ r_{\text{eff}} = \left(1+\frac{r}{m}\right)^m - 1 \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① PV — Diskrit</h4>
+      <div class="field"><label>Future Value</label><input type="number" id="c1-pvd-fv" value="1000" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>r (%)</label><input type="number" id="c1-pvd-r" value="7" step="0.01"></div>
+        <div class="field"><label>n (tahun)</label><input type="number" id="c1-pvd-n" value="5" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcC1PVDiscrete()">Hitung PV</button>
+      <div class="result" id="c1-pvd-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② FV — Diskrit</h4>
+      <div class="field"><label>Present Value</label><input type="number" id="c1-fvd-pv" value="1000" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>r (%)</label><input type="number" id="c1-fvd-r" value="7" step="0.01"></div>
+        <div class="field"><label>n (tahun)</label><input type="number" id="c1-fvd-n" value="5" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcC1FVDiscrete()">Hitung FV</button>
+      <div class="result" id="c1-fvd-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>③ PV — Kontinu</h4>
+      <div class="field"><label>Future Value</label><input type="number" id="c1-pvc-fv" value="1000" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>r (%)</label><input type="number" id="c1-pvc-r" value="7" step="0.01"></div>
+        <div class="field"><label>t (tahun)</label><input type="number" id="c1-pvc-t" value="5" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcC1PVCont()">Hitung PV</button>
+      <div class="result" id="c1-pvc-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>④ FV — Kontinu</h4>
+      <div class="field"><label>Present Value</label><input type="number" id="c1-fvc-pv" value="1000" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>r (%)</label><input type="number" id="c1-fvc-r" value="7" step="0.01"></div>
+        <div class="field"><label>t (tahun)</label><input type="number" id="c1-fvc-t" value="5" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcC1FVCont()">Hitung FV</button>
+      <div class="result" id="c1-fvc-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>⑤ PV Annuity</h4>
+      <div class="field"><label>Cashflow per periode (C)</label><input type="number" id="c1-ann-c" value="100" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>r (%)</label><input type="number" id="c1-ann-r" value="6" step="0.01"></div>
+        <div class="field"><label>n (periode)</label><input type="number" id="c1-ann-n" value="10" step="1"></div>
+      </div>
+      <button class="btn" onclick="calcC1Annuity()">Hitung PV</button>
+      <div class="result" id="c1-ann-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>⑥ PV Perpetuity</h4>
+      <div class="field"><label>Cashflow per periode (C)</label><input type="number" id="c1-perp-c" value="100" step="0.01"></div>
+      <div class="field"><label>r (%)</label><input type="number" id="c1-perp-r" value="6" step="0.01"></div>
+      <button class="btn" onclick="calcC1Perpetuity()">Hitung PV</button>
+      <div class="result" id="c1-perp-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>⑦ Effective Annual Rate</h4>
+      <div class="field"><label>Nominal Rate r (%)</label><input type="number" id="c1-ear-r" value="12" step="0.01"></div>
+      <div class="field"><label>Frekuensi Kompon (m per tahun)</label><input type="number" id="c1-ear-m" value="12" step="1"></div>
+      <button class="btn" onclick="calcC1EAR()">Hitung EAR</button>
+      <div class="result" id="c1-ear-result"></div>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-C2" data-cat="C">
+  <div class="section-head">
+    <span class="code-badge">C2 · BONDS</span>
+    <h2>Fixed Income: Bonds</h2>
+    <p class="intro">Harga obligasi, yield, dan sensitivitas harga terhadap perubahan suku bunga (duration &amp; convexity).</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Bond Price</div>
+    \[ P = \sum_{t=1}^n \frac{C}{(1+r)^t} + \frac{F}{(1+r)^n} \]
+    <div class="f-label">Current Yield</div>
+    \[ \text{Current Yield} = \frac{\text{Annual Coupon}}{\text{Price}} \]
+    <div class="f-label">Macaulay Duration</div>
+    \[ D = \frac{\sum_{t=1}^n t \cdot PV(CF_t)}{P} \]
+    <div class="f-label">Modified Duration</div>
+    \[ D^{*} = \frac{D}{1+y}, \qquad \frac{\Delta P}{P} \approx -D^{*}\Delta y \]
+    <div class="f-label">Convexity</div>
+    \[ C_{vx} = \frac{1}{P}\frac{\partial^2 P}{\partial y^2} \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Harga Obligasi &amp; Current Yield</h4>
+      <div class="field"><label>Face Value (F)</label><input type="number" id="c2-p-face" value="1000" step="1"></div>
+      <div class="two-col">
+        <div class="field"><label>Kupon Tahunan (%)</label><input type="number" id="c2-p-coupon" value="6" step="0.01"></div>
+        <div class="field"><label>Yield/Diskonto (%)</label><input type="number" id="c2-p-yield" value="5" step="0.01"></div>
+      </div>
+      <div class="field"><label>Jumlah Periode (n)</label><input type="number" id="c2-p-n" value="10" step="1"></div>
+      <button class="btn" onclick="calcC2Price()">Hitung Harga</button>
+      <div class="result" id="c2-p-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② Macaulay &amp; Modified Duration</h4>
+      <div class="field"><label>Face Value (F)</label><input type="number" id="c2-d-face" value="1000" step="1"></div>
+      <div class="two-col">
+        <div class="field"><label>Kupon Tahunan (%)</label><input type="number" id="c2-d-coupon" value="6" step="0.01"></div>
+        <div class="field"><label>Yield (%)</label><input type="number" id="c2-d-yield" value="5" step="0.01"></div>
+      </div>
+      <div class="field"><label>Jumlah Periode (n)</label><input type="number" id="c2-d-n" value="10" step="1"></div>
+      <button class="btn" onclick="calcC2Duration()">Hitung Duration</button>
+      <div class="result" id="c2-d-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>③ Estimasi ΔP/P dari Duration</h4>
+      <div class="field"><label>Modified Duration (D*)</label><input type="number" id="c2-dp-d" value="7.8" step="0.01"></div>
+      <div class="field"><label>Perubahan Yield Δy (%)</label><input type="number" id="c2-dp-dy" value="0.5" step="0.01"></div>
+      <button class="btn" onclick="calcC2DeltaP()">Hitung %ΔP</button>
+      <div class="result" id="c2-dp-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>④ Convexity (aproksimasi numerik)</h4>
+      <div class="field"><label>Face Value (F)</label><input type="number" id="c2-cv-face" value="1000" step="1"></div>
+      <div class="two-col">
+        <div class="field"><label>Kupon Tahunan (%)</label><input type="number" id="c2-cv-coupon" value="6" step="0.01"></div>
+        <div class="field"><label>Yield (%)</label><input type="number" id="c2-cv-yield" value="5" step="0.01"></div>
+      </div>
+      <div class="field"><label>Jumlah Periode (n)</label><input type="number" id="c2-cv-n" value="10" step="1"></div>
+      <button class="btn" onclick="calcC2Convexity()">Hitung Convexity</button>
+      <div class="result" id="c2-cv-result"></div>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-C3" data-cat="C">
+  <div class="section-head">
+    <span class="code-badge">C3 · YIELD CURVE</span>
+    <h2>Yield Curve &amp; Term Structure</h2>
+    <p class="intro">Menurunkan forward rate implisit dari dua titik spot rate pada kurva yield.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Hubungan Spot &amp; Forward Rate</div>
+    \[ (1+r_{t_2})^{t_2} = (1+r_{t_1})^{t_1}(1+f_{t_1,t_2})^{t_2-t_1} \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Forward Rate Implisit</h4>
+      <div class="two-col">
+        <div class="field"><label>Spot Rate r(t₁) (%)</label><input type="number" id="c3-r1" value="3.5" step="0.01"></div>
+        <div class="field"><label>t₁ (tahun)</label><input type="number" id="c3-t1" value="1" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Spot Rate r(t₂) (%)</label><input type="number" id="c3-r2" value="4.2" step="0.01"></div>
+        <div class="field"><label>t₂ (tahun)</label><input type="number" id="c3-t2" value="2" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcC3Forward()">Hitung Forward Rate</button>
+      <div class="result" id="c3-result"></div>
+    </div>
+  </div>
+</section>
+<!-- ================= CATEGORY D: PORTOFOLIO & RISIKO ================= -->
+
+<section class="topic-section" id="sec-D1" data-cat="D">
+  <div class="section-head">
+    <span class="code-badge">D1 · MPT</span>
+    <h2>Modern Portfolio Theory</h2>
+    <p class="intro">Diversifikasi menurunkan risiko portofolio selama korelasi antar aset tidak sempurna positif.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Expected Return Portfolio</div>
+    \[ E[R_p] = \sum_{i=1}^n w_i E[R_i] \]
+    <div class="f-label">Portfolio Variance (2 aset)</div>
+    \[ \sigma_p^2 = w_1^2\sigma_1^2 + w_2^2\sigma_2^2 + 2w_1w_2\sigma_1\sigma_2\rho_{12} \]
+    <div class="f-label">Portfolio Variance (umum)</div>
+    \[ \sigma_p^2 = \sum_{i=1}^n\sum_{j=1}^n w_i w_j \sigma_i \sigma_j \rho_{ij} \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Expected Return (3 Aset)</h4>
+      <div class="two-col">
+        <div class="field"><label>w₁</label><input type="number" id="d1-er-w1" value="0.4" step="0.01"></div>
+        <div class="field"><label>E[R₁] (%)</label><input type="number" id="d1-er-r1" value="8" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>w₂</label><input type="number" id="d1-er-w2" value="0.35" step="0.01"></div>
+        <div class="field"><label>E[R₂] (%)</label><input type="number" id="d1-er-r2" value="11" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>w₃</label><input type="number" id="d1-er-w3" value="0.25" step="0.01"></div>
+        <div class="field"><label>E[R₃] (%)</label><input type="number" id="d1-er-r3" value="5" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcD1ExpReturn()">Hitung E[Rp]</button>
+      <div class="result" id="d1-er-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② Portfolio Variance (2 Aset)</h4>
+      <div class="two-col">
+        <div class="field"><label>w₁</label><input type="number" id="d1-v-w1" value="0.6" step="0.01"></div>
+        <div class="field"><label>w₂</label><input type="number" id="d1-v-w2" value="0.4" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>σ₁ (%)</label><input type="number" id="d1-v-s1" value="18" step="0.01"></div>
+        <div class="field"><label>σ₂ (%)</label><input type="number" id="d1-v-s2" value="25" step="0.01"></div>
+      </div>
+      <div class="field"><label>ρ₁₂</label><input type="number" id="d1-v-rho" value="0.3" step="0.01"></div>
+      <button class="btn" onclick="calcD1Variance()">Hitung σp</button>
+      <div class="result" id="d1-v-result"></div>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-D2" data-cat="D">
+  <div class="section-head">
+    <span class="code-badge">D2 · CAPM</span>
+    <h2>Capital Asset Pricing Model</h2>
+    <p class="intro">Menghubungkan return yang diharapkan suatu aset dengan risiko sistematisnya (beta) relatif terhadap pasar.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">CAPM</div>
+    \[ E[R_i] = R_f + \beta_i(E[R_m]-R_f) \]
+    <div class="f-label">Beta</div>
+    \[ \beta_i = \frac{\text{Cov}(R_i,R_m)}{\text{Var}(R_m)} = \rho_{i,m}\frac{\sigma_i}{\sigma_m} \]
+    <div class="f-label">Alpha (Jensen's Alpha)</div>
+    \[ \alpha_i = R_i - [R_f + \beta_i(R_m-R_f)] \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Expected Return (CAPM)</h4>
+      <div class="field"><label>Risk-free Rate Rf (%)</label><input type="number" id="d2-c-rf" value="4" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>Beta (β)</label><input type="number" id="d2-c-beta" value="1.2" step="0.01"></div>
+        <div class="field"><label>E[Rm] (%)</label><input type="number" id="d2-c-rm" value="10" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcD2CAPM()">Hitung E[Ri]</button>
+      <div class="result" id="d2-c-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② Beta dari Cov &amp; Var</h4>
+      <div class="field"><label>Cov(Ri, Rm)</label><input type="number" id="d2-b-cov" value="0.0054" step="0.0001"></div>
+      <div class="field"><label>Var(Rm)</label><input type="number" id="d2-b-var" value="0.0045" step="0.0001"></div>
+      <button class="btn" onclick="calcD2Beta()">Hitung β</button>
+      <div class="result" id="d2-b-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>③ Alpha (Jensen's)</h4>
+      <div class="field"><label>Return Aktual Ri (%)</label><input type="number" id="d2-a-ri" value="12" step="0.01"></div>
+      <div class="field"><label>Risk-free Rf (%)</label><input type="number" id="d2-a-rf" value="4" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>Beta</label><input type="number" id="d2-a-beta" value="1.2" step="0.01"></div>
+        <div class="field"><label>Rm (%)</label><input type="number" id="d2-a-rm" value="10" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcD2Alpha()">Hitung α</button>
+      <div class="result" id="d2-a-result"></div>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-D3" data-cat="D">
+  <div class="section-head">
+    <span class="code-badge">D3 · MULTI-FACTOR</span>
+    <h2>Multi-Factor Models</h2>
+    <p class="intro">Perluasan CAPM dengan faktor risiko tambahan seperti size, value, momentum, dan profitability.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Fama-French 3-Factor</div>
+    \[ R_i - R_f = \alpha + \beta_m(R_m-R_f) + \beta_s\,\text{SMB} + \beta_v\,\text{HML} + \epsilon \]
+    <p class="f-note">Carhart 4-Factor: tambahkan MOM (momentum). Fama-French 5-Factor: tambahkan RMW (profitability) &amp; CMA (investment).</p>
+    <div class="f-label">Arbitrage Pricing Theory (APT)</div>
+    \[ E[R_i] = R_f + \sum_{j=1}^k \beta_{ij}\lambda_j \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Fama-French 3-Factor</h4>
+      <div class="two-col">
+        <div class="field"><label>α (%)</label><input type="number" id="d3-ff-alpha" value="0.2" step="0.01"></div>
+        <div class="field"><label>Rf (%)</label><input type="number" id="d3-ff-rf" value="4" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>β market</label><input type="number" id="d3-ff-bm" value="1.1" step="0.01"></div>
+        <div class="field"><label>Rm (%)</label><input type="number" id="d3-ff-rm" value="10" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>β SMB</label><input type="number" id="d3-ff-bs" value="0.3" step="0.01"></div>
+        <div class="field"><label>SMB (%)</label><input type="number" id="d3-ff-smb" value="2" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>β HML</label><input type="number" id="d3-ff-bv" value="-0.2" step="0.01"></div>
+        <div class="field"><label>HML (%)</label><input type="number" id="d3-ff-hml" value="3" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcD3FamaFrench()">Hitung Ri</button>
+      <div class="result" id="d3-ff-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② APT (3 Faktor)</h4>
+      <div class="field"><label>Rf (%)</label><input type="number" id="d3-apt-rf" value="4" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>β₁</label><input type="number" id="d3-apt-b1" value="1.0" step="0.01"></div>
+        <div class="field"><label>λ₁ (%)</label><input type="number" id="d3-apt-l1" value="5" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>β₂</label><input type="number" id="d3-apt-b2" value="0.6" step="0.01"></div>
+        <div class="field"><label>λ₂ (%)</label><input type="number" id="d3-apt-l2" value="2" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>β₃</label><input type="number" id="d3-apt-b3" value="0.3" step="0.01"></div>
+        <div class="field"><label>λ₃ (%)</label><input type="number" id="d3-apt-l3" value="1.5" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcD3APT()">Hitung E[Ri]</button>
+      <div class="result" id="d3-apt-result"></div>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-D4" data-cat="D">
+  <div class="section-head">
+    <span class="code-badge">D4 · RISK</span>
+    <h2>Risk Measures</h2>
+    <p class="intro">Volatilitas, Value at Risk, dan Conditional VaR — ukuran inti risiko downside dalam manajemen portofolio.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Volatility (sampel) &amp; Annualized</div>
+    \[ \sigma = \sqrt{\frac{1}{n-1}\sum_{i=1}^n (R_i-\bar{R})^2}, \qquad \sigma_{\text{annual}} = \sigma_{\text{daily}} \times \sqrt{252} \]
+    <div class="f-label">Value at Risk (VaR)</div>
+    \[ P(\Delta P < -\text{VaR}_\alpha) = \alpha \]
+    <div class="f-label">Conditional VaR (Expected Shortfall)</div>
+    \[ \text{CVaR}_\alpha = E[\Delta P \mid \Delta P < -\text{VaR}_\alpha] \]
+    <div class="f-label">Sharpe Ratio</div>
+    \[ SR = \frac{E[R_p]-R_f}{\sigma_p} \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Volatilitas dari Data Return (%)</h4>
+      <div class="field"><label>Return harian, pisahkan koma (%)</label><textarea id="d4-vol-data">1.2,-0.8,0.5,1.5,-1.1,0.3,0.9,-0.4,1.0,-0.2</textarea></div>
+      <button class="btn" onclick="calcD4Volatility()">Hitung σ Harian &amp; Tahunan</button>
+      <div class="result" id="d4-vol-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② Parametric VaR &amp; CVaR</h4>
+      <div class="field"><label>Nilai Portofolio</label><input type="number" id="d4-var-pv" value="1000000" step="1000"></div>
+      <div class="two-col">
+        <div class="field"><label>Expected Return μ (%)</label><input type="number" id="d4-var-mu" value="0.5" step="0.01"></div>
+        <div class="field"><label>Std Dev σ (%)</label><input type="number" id="d4-var-sigma" value="2.2" step="0.01"></div>
+      </div>
+      <div class="field"><label>Confidence Level</label>
+        <select id="d4-var-conf">
+          <option value="0.90">90%</option>
+          <option value="0.95" selected>95%</option>
+          <option value="0.99">99%</option>
+        </select>
+      </div>
+      <button class="btn" onclick="calcD4VaR()">Hitung VaR &amp; CVaR</button>
+      <div class="result" id="d4-var-result"></div>
+      <p class="f-note">Asumsi return terdistribusi normal (parametric VaR).</p>
+    </div>
+
+    <div class="calc-card">
+      <h4>③ Sharpe Ratio</h4>
+      <div class="field"><label>E[Rp] (%)</label><input type="number" id="d4-sh-rp" value="12" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>Risk-free Rf (%)</label><input type="number" id="d4-sh-rf" value="4" step="0.01"></div>
+        <div class="field"><label>σp (%)</label><input type="number" id="d4-sh-sigma" value="18" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcD4Sharpe()">Hitung SR</button>
+      <div class="result" id="d4-sh-result"></div>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-D5" data-cat="D">
+  <div class="section-head">
+    <span class="code-badge">D5 · PERFORMANCE</span>
+    <h2>Performance Metrics</h2>
+    <p class="intro">Sortino, Information Ratio, Maximum Drawdown, dan Calmar Ratio — melengkapi Sharpe untuk evaluasi manajer investasi.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Sortino Ratio</div>
+    \[ \text{Sortino} = \frac{E[R_p]-R_f}{\sigma_{\text{downside}}} \]
+    <div class="f-label">Information Ratio</div>
+    \[ IR = \frac{E[R_p - R_b]}{\text{Tracking Error}} = \frac{\alpha}{\sigma(\alpha)} \]
+    <div class="f-label">Maximum Drawdown</div>
+    \[ MDD = \max_t \left[\frac{\text{Peak}_t - \text{Trough}_t}{\text{Peak}_t}\right] \]
+    <div class="f-label">Calmar Ratio</div>
+    \[ \text{Calmar} = \frac{\text{Annual Return}}{MDD} \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Sortino Ratio</h4>
+      <div class="field"><label>E[Rp] (%)</label><input type="number" id="d5-so-rp" value="12" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>Rf (%)</label><input type="number" id="d5-so-rf" value="4" step="0.01"></div>
+        <div class="field"><label>Downside Dev (%)</label><input type="number" id="d5-so-dd" value="10" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcD5Sortino()">Hitung</button>
+      <div class="result" id="d5-so-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② Information Ratio</h4>
+      <div class="field"><label>Excess Return α / (Rp−Rb) (%)</label><input type="number" id="d5-ir-alpha" value="2.5" step="0.01"></div>
+      <div class="field"><label>Tracking Error (%)</label><input type="number" id="d5-ir-te" value="4" step="0.01"></div>
+      <button class="btn" onclick="calcD5IR()">Hitung IR</button>
+      <div class="result" id="d5-ir-result"></div>
+    </div>
+
+    <div class="calc-card" style="grid-column:1/-1;">
+      <h4>③ Maximum Drawdown dari Data</h4>
+      <div class="field"><label>Nilai portofolio berurutan, pisahkan koma</label><textarea id="d5-mdd-data">100,108,115,104,96,101,112,120,109,118,130,122</textarea></div>
+      <button class="btn" onclick="calcD5MDD()">Hitung MDD</button>
+      <div class="result" id="d5-mdd-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>④ Calmar Ratio</h4>
+      <div class="field"><label>Annual Return (%)</label><input type="number" id="d5-cal-ret" value="15" step="0.01"></div>
+      <div class="field"><label>MDD (%)</label><input type="number" id="d5-cal-mdd" value="18" step="0.01"></div>
+      <button class="btn" onclick="calcD5Calmar()">Hitung Calmar</button>
+      <div class="result" id="d5-cal-result"></div>
+    </div>
+  </div>
+</section>
+<!-- ================= CATEGORY E: FX, KOMODITAS & STOKASTIK ================= -->
+
+<section class="topic-section" id="sec-E1" data-cat="E">
+  <div class="section-head">
+    <span class="code-badge">E1 · FX</span>
+    <h2>Foreign Exchange (FX)</h2>
+    <p class="intro">Interest rate parity, purchasing power parity, dan return dari strategi carry trade.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Interest Rate Parity</div>
+    \[ F = S \cdot e^{(r_d - r_f)T} \]
+    <div class="f-label">Purchasing Power Parity</div>
+    \[ \frac{S_1}{S_0} = \frac{1+\pi_d}{1+\pi_f} \]
+    <div class="f-label">Carry Trade Return</div>
+    \[ \text{Return} \approx r_{\text{high}} - r_{\text{low}} - \frac{\Delta S}{S} \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Interest Rate Parity (Forward FX)</h4>
+      <div class="field"><label>Spot Rate (S)</label><input type="number" id="e1-irp-s" value="15800" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>r domestik (%)</label><input type="number" id="e1-irp-rd" value="6" step="0.01"></div>
+        <div class="field"><label>r asing (%)</label><input type="number" id="e1-irp-rf" value="4.5" step="0.01"></div>
+      </div>
+      <div class="field"><label>T (tahun)</label><input type="number" id="e1-irp-t" value="1" step="0.01"></div>
+      <button class="btn" onclick="calcE1IRP()">Hitung Forward Rate</button>
+      <div class="result" id="e1-irp-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② Purchasing Power Parity</h4>
+      <div class="field"><label>Spot Rate Awal (S₀)</label><input type="number" id="e1-ppp-s0" value="15800" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>Inflasi domestik (%)</label><input type="number" id="e1-ppp-pid" value="4" step="0.01"></div>
+        <div class="field"><label>Inflasi asing (%)</label><input type="number" id="e1-ppp-pif" value="2" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcE1PPP()">Hitung S₁</button>
+      <div class="result" id="e1-ppp-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>③ Carry Trade Return</h4>
+      <div class="two-col">
+        <div class="field"><label>r high-yield (%)</label><input type="number" id="e1-ct-rh" value="8" step="0.01"></div>
+        <div class="field"><label>r low-yield (%)</label><input type="number" id="e1-ct-rl" value="1" step="0.01"></div>
+      </div>
+      <div class="field"><label>Depresiasi mata uang high-yield ΔS/S (%)</label><input type="number" id="e1-ct-ds" value="2" step="0.01"></div>
+      <button class="btn" onclick="calcE1Carry()">Hitung Return</button>
+      <div class="result" id="e1-ct-result"></div>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-E2" data-cat="E">
+  <div class="section-head">
+    <span class="code-badge">E2 · COMMODITIES</span>
+    <h2>Commodities</h2>
+    <p class="intro">Hubungan spot-forward pada komoditas dipengaruhi biaya penyimpanan (storage cost) dan convenience yield.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Spot-Forward Relationship</div>
+    \[ F = S \cdot e^{(r+u-y)T} \]
+    <p class="f-note">u = storage cost, y = convenience yield</p>
+    <div class="f-label">Roll Yield</div>
+    \[ \text{Roll Yield} \approx \frac{F_{\text{near}}-F_{\text{far}}}{F_{\text{near}}} \]
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Forward Price Komoditas</h4>
+      <div class="field"><label>Spot Price (S)</label><input type="number" id="e2-fp-s" value="80" step="0.01"></div>
+      <div class="two-col">
+        <div class="field"><label>r (%)</label><input type="number" id="e2-fp-r" value="5" step="0.01"></div>
+        <div class="field"><label>Storage cost u (%)</label><input type="number" id="e2-fp-u" value="2" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>Convenience yield y (%)</label><input type="number" id="e2-fp-y" value="1.5" step="0.01"></div>
+        <div class="field"><label>T (tahun)</label><input type="number" id="e2-fp-t" value="1" step="0.01"></div>
+      </div>
+      <button class="btn" onclick="calcE2Forward()">Hitung F</button>
+      <div class="result" id="e2-fp-result"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② Roll Yield</h4>
+      <div class="field"><label>Forward Near-month</label><input type="number" id="e2-ry-near" value="80" step="0.01"></div>
+      <div class="field"><label>Forward Far-month</label><input type="number" id="e2-ry-far" value="82" step="0.01"></div>
+      <button class="btn" onclick="calcE2Roll()">Hitung Roll Yield</button>
+      <div class="result" id="e2-ry-result"></div>
+    </div>
+  </div>
+</section>
+
+<section class="topic-section" id="sec-E3" data-cat="E">
+  <div class="section-head">
+    <span class="code-badge">E3 · STOCHASTIC</span>
+    <h2>Stochastic Calculus Basics</h2>
+    <p class="intro">Brownian motion, Geometric Brownian Motion (model dasar harga saham), dan Itô's Lemma.</p>
+  </div>
+
+  <div class="formula-card">
+    <div class="f-label">Brownian Motion W_t</div>
+    <p class="f-note">· W₀ = 0 &nbsp;&nbsp; · Wₜ − Wₛ ∼ N(0, t−s) &nbsp;&nbsp; · (dWₜ)² = dt</p>
+    <div class="f-label">Geometric Brownian Motion</div>
+    \[ dS_t = \mu S_t\, dt + \sigma S_t\, dW_t \]
+    <div class="f-label">Solusi GBM</div>
+    \[ S_t = S_0 \exp\left[\left(\mu - \frac{\sigma^2}{2}\right)t + \sigma W_t\right] \]
+    <div class="f-label">Itô's Lemma — untuk Y = f(S_t, t)</div>
+    \[ dY = \left(\frac{\partial f}{\partial t} + \mu S_t \frac{\partial f}{\partial S} + \frac{1}{2}\sigma^2 S_t^2 \frac{\partial^2 f}{\partial S^2}\right)dt + \sigma S_t \frac{\partial f}{\partial S}\,dW \]
+    <p class="f-note">Contoh: jika Y = ln(Sₜ), maka dY = (μ − ½σ²)dt + σ dWₜ — inilah asal rumus solusi GBM di atas.</p>
+  </div>
+
+  <div class="calc-grid">
+    <div class="calc-card">
+      <h4>① Simulasi Brownian Motion W_t</h4>
+      <div class="two-col">
+        <div class="field"><label>Total waktu T</label><input type="number" id="e3-bm-t" value="1" step="0.01"></div>
+        <div class="field"><label>Jumlah langkah</label><input type="number" id="e3-bm-n" value="200" step="1"></div>
+      </div>
+      <button class="btn" onclick="simE3Brownian()">Simulasikan Path</button>
+      <div class="result" id="e3-bm-result"></div>
+      <div id="e3-bm-chart"></div>
+    </div>
+
+    <div class="calc-card">
+      <h4>② Simulasi Geometric Brownian Motion</h4>
+      <div class="two-col">
+        <div class="field"><label>S₀</label><input type="number" id="e3-gbm-s0" value="100" step="0.01"></div>
+        <div class="field"><label>μ (%)</label><input type="number" id="e3-gbm-mu" value="8" step="0.01"></div>
+      </div>
+      <div class="two-col">
+        <div class="field"><label>σ (%)</label><input type="number" id="e3-gbm-sigma" value="25" step="0.01"></div>
+        <div class="field"><label>T (tahun)</label><input type="number" id="e3-gbm-t" value="1" step="0.01"></div>
+      </div>
+      <div class="field"><label>Jumlah langkah</label><input type="number" id="e3-gbm-n" value="200" step="1"></div>
+      <button class="btn" onclick="simE3GBM()">Simulasikan Path</button>
+      <div class="result" id="e3-gbm-result"></div>
+      <div id="e3-gbm-chart"></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="credits">Quant Finance Toolkit — dibuat untuk referensi belajar. Semua kalkulator menggunakan rumus persis seperti pada materi sumber; beberapa (Z-spread, convexity, VaR/CVaR) memakai penyederhanaan yang dicatat di catatan masing-masing kartu.</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/katex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.9/contrib/auto-render.min.js"></script>
+<script>
+/* ============ NAVIGATION DATA ============ */
+const CATS = [
+  {id:'A', label:'Fundamental', icon:'📊', topics:[
+    {id:'A1', label:'Credit Risk & Spread'},
+    {id:'A2', label:'Valuasi Ekuitas'},
+    {id:'A3', label:'Rasio Keuangan'}
+  ]},
+  {id:'B', label:'Statistik & Ekonometrika', icon:'📈', topics:[
+    {id:'B1', label:'Regression Analysis'},
+    {id:'B2', label:'Hypothesis Testing'},
+    {id:'B3', label:'Probability & Statistics'},
+    {id:'B4', label:'Time Series'},
+    {id:'B5', label:'Correlation & Covariance'}
+  ]},
+  {id:'C', label:'Fixed Income & TVM', icon:'💰', topics:[
+    {id:'C1', label:'Time Value of Money'},
+    {id:'C2', label:'Bonds'},
+    {id:'C3', label:'Yield Curve'}
+  ]},
+  {id:'D', label:'Portofolio & Risiko', icon:'📉', topics:[
+    {id:'D1', label:'Modern Portfolio Theory'},
+    {id:'D2', label:'CAPM'},
+    {id:'D3', label:'Multi-Factor Models'},
+    {id:'D4', label:'Risk Measures'},
+    {id:'D5', label:'Performance Metrics'}
+  ]},
+  {id:'E', label:'FX, Komoditas & Stokastik', icon:'🌍', topics:[
+    {id:'E1', label:'Foreign Exchange'},
+    {id:'E2', label:'Commodities'},
+    {id:'E3', label:'Stochastic Calculus'}
+  ]}
+];
+let currentCat = 'A';
+let currentTopic = 'A1';
+
+function renderCatTabs(){
+  const nav = document.getElementById('catTabs');
+  nav.innerHTML = CATS.map(c => '<button class="cat-tab'+(c.id===currentCat?' active':'')+'" data-cat="'+c.id+'">'+c.icon+' '+c.label+'</button>').join('');
+  nav.querySelectorAll('.cat-tab').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      currentCat = btn.dataset.cat;
+      const cat = CATS.find(function(c){ return c.id===currentCat; });
+      currentTopic = cat.topics[0].id;
+      renderCatTabs();
+      renderTopicPills();
+      showSection(currentTopic);
+    });
+  });
+}
+function renderTopicPills(){
+  const cat = CATS.find(function(c){ return c.id===currentCat; });
+  const wrap = document.getElementById('topicPills');
+  wrap.innerHTML = cat.topics.map(function(t){
+    return '<button class="topic-pill'+(t.id===currentTopic?' active':'')+'" data-topic="'+t.id+'"><span class="code">'+t.id+'</span>'+t.label+'</button>';
+  }).join('');
+  wrap.querySelectorAll('.topic-pill').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      currentTopic = btn.dataset.topic;
+      renderTopicPills();
+      showSection(currentTopic);
+    });
+  });
+}
+function showSection(id){
+  document.querySelectorAll('.topic-section').forEach(function(s){ s.classList.remove('active'); });
+  const el = document.getElementById('sec-'+id);
+  if(el) el.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ============ HELPER MATH FUNCTIONS ============ */
+function num(id){ const el=document.getElementById(id); const v=parseFloat(el.value); return isNaN(v)?0:v; }
+function pct(id){ return num(id)/100; }
+function parseList(id){
+  return document.getElementById(id).value.split(/[,\s]+/).map(Number).filter(function(v){ return !isNaN(v); });
+}
+function fmt(x, d){
+  if(d===undefined) d=4;
+  if(x===null||x===undefined||isNaN(x)) return '—';
+  if(!isFinite(x)) return (x>0?'∞':'-∞');
+  return x.toFixed(d);
+}
+function mean(arr){ return arr.reduce(function(a,b){return a+b;},0)/arr.length; }
+function sampleVariance(arr){
+  const m=mean(arr);
+  return arr.reduce(function(s,x){return s+(x-m)*(x-m);},0)/(arr.length-1);
+}
+function sampleStdev(arr){ return Math.sqrt(sampleVariance(arr)); }
+function covariance(x,y){
+  const mx=mean(x), my=mean(y);
+  let s=0;
+  for(let i=0;i<x.length;i++) s += (x[i]-mx)*(y[i]-my);
+  return s/(x.length-1);
+}
+function skewness(arr){
+  const m=mean(arr), n=arr.length;
+  const m2 = arr.reduce(function(s,x){return s+Math.pow(x-m,2);},0)/n;
+  const m3 = arr.reduce(function(s,x){return s+Math.pow(x-m,3);},0)/n;
+  return m3/Math.pow(m2,1.5);
+}
+function kurtosis(arr){
+  const m=mean(arr), n=arr.length;
+  const m2 = arr.reduce(function(s,x){return s+Math.pow(x-m,2);},0)/n;
+  const m4 = arr.reduce(function(s,x){return s+Math.pow(x-m,4);},0)/n;
+  return m4/Math.pow(m2,2);
+}
+function normPDF(z){ return Math.exp(-z*z/2)/Math.sqrt(2*Math.PI); }
+function normCDF(z){
+  const b1=0.319381530, b2=-0.356563782, b3=1.781477937, b4=-1.821255978, b5=1.330274429;
+  const p=0.2316419, c=0.39894228;
+  if(z>=0){ const t=1/(1+p*z); return 1-c*Math.exp(-z*z/2)*t*(t*(t*(t*(t*b5+b4)+b3)+b2)+b1); }
+  else { const t=1/(1-p*z); return c*Math.exp(-z*z/2)*t*(t*(t*(t*(t*b5+b4)+b3)+b2)+b1); }
+}
+const Z_TABLE = {'0.90':1.2816, '0.95':1.6449, '0.99':2.3263};
+function randn(){
+  let u=0,v=0;
+  while(u===0) u=Math.random();
+  while(v===0) v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);
+}
+function drawPathChart(containerId, data){
+  const w=560,h=200,pad=28;
+  const minY=Math.min.apply(null,data), maxY=Math.max.apply(null,data);
+  const rangeY=(maxY-minY)||1;
+  const stepX=(w-2*pad)/(data.length-1);
+  const points = data.map(function(y,i){
+    const x = pad+i*stepX;
+    const yy = h-pad-((y-minY)/rangeY)*(h-2*pad);
+    return x.toFixed(1)+','+yy.toFixed(1);
+  }).join(' ');
+  const svg = '<svg viewBox="0 0 '+w+' '+h+'" class="path-chart" preserveAspectRatio="none">'
+    + '<line x1="'+pad+'" y1="'+(h-pad)+'" x2="'+(w-pad)+'" y2="'+(h-pad)+'" stroke="#26314a" stroke-width="1"/>'
+    + '<polyline points="'+points+'" fill="none" stroke="#45c4a0" stroke-width="2"/></svg>';
+  document.getElementById(containerId).innerHTML = svg;
+}
+
+/* ============ CATEGORY A: FUNDAMENTAL ============ */
+function calcA1Spread(){
+  const yc=num('a1-corp'), yt=num('a1-tsy');
+  const spread=yc-yt;
+  document.getElementById('a1-spread-result').textContent =
+    'Credit Spread = '+spread.toFixed(3)+'% ('+(spread*100).toFixed(1)+' bps)';
+}
+function calcA1DefaultProb(){
+  const spread=pct('a1-dp-spread'), rec=pct('a1-dp-recovery');
+  if(rec>=1){ document.getElementById('a1-dp-result').textContent='Recovery rate harus < 100%.'; return; }
+  const pd = spread/(1-rec);
+  document.getElementById('a1-dp-result').textContent = 'Probabilitas Default ≈ '+fmt(pd*100,3)+'%';
+}
+function calcA1ZSpread(){
+  const F=num('a1-zs-face'), couponPct=num('a1-zs-coupon'), rPct=num('a1-zs-r'), zBps=num('a1-zs-z'), n=num('a1-zs-n');
+  const C=couponPct/100*F;
+  const disc=rPct/100+zBps/10000;
+  let P=0;
+  for(let t=1;t<=n;t++) P += C/Math.pow(1+disc,t);
+  P += F/Math.pow(1+disc,n);
+  document.getElementById('a1-zs-result').textContent =
+    'Harga Obligasi P = '+fmt(P,2)+'\n(discount rate efektif r+z = '+(disc*100).toFixed(3)+'%)';
+}
+function calcA2GGM(){
+  const d1=num('a2-ggm-d1'), r=pct('a2-ggm-r'), g=pct('a2-ggm-g');
+  if(r<=g){ document.getElementById('a2-ggm-result').textContent='r harus > g agar model valid.'; return; }
+  document.getElementById('a2-ggm-result').textContent = 'P₀ = '+fmt(d1/(r-g),2);
+}
+function calcA2FCF(){
+  const fcf1=num('a2-fcf-fcf1'), wacc=pct('a2-fcf-wacc'), g=pct('a2-fcf-g');
+  if(wacc<=g){ document.getElementById('a2-fcf-result').textContent='WACC harus > g agar model valid.'; return; }
+  document.getElementById('a2-fcf-result').textContent = 'P₀ = '+fmt(fcf1/(wacc-g),2)+'\n(versi perpetuity-growth satu tahap)';
+}
+function calcA2Multiples(){
+  const price=num('a2-mult-price'), eps=num('a2-mult-eps'), bv=num('a2-mult-bv'), ev=num('a2-mult-ev'), ebitda=num('a2-mult-ebitda');
+  document.getElementById('a2-mult-result').textContent =
+    'P/E = '+fmt(price/eps,2)+'x\nP/B = '+fmt(price/bv,2)+'x\nEV/EBITDA = '+fmt(ev/ebitda,2)+'x';
+}
+function calcA3Profit(){
+  const ni=num('a3-p-ni'), eq=num('a3-p-eq'), assets=num('a3-p-assets'), rev=num('a3-p-rev');
+  document.getElementById('a3-p-result').textContent =
+    'ROE = '+fmt(ni/eq*100,2)+'%\nROA = '+fmt(ni/assets*100,2)+'%\nProfit Margin = '+fmt(ni/rev*100,2)+'%';
+}
+function calcA3Liquidity(){
+  const ca=num('a3-l-ca'), cl=num('a3-l-cl'), inv=num('a3-l-inv');
+  document.getElementById('a3-l-result').textContent =
+    'Current Ratio = '+fmt(ca/cl,2)+'x\nQuick Ratio = '+fmt((ca-inv)/cl,2)+'x';
+}
+function calcA3Leverage(){
+  const debt=num('a3-lev-debt'), eq=num('a3-lev-eq'), ebit=num('a3-lev-ebit'), interest=num('a3-lev-int');
+  document.getElementById('a3-lev-result').textContent =
+    'D/E = '+fmt(debt/eq,2)+'x\nInterest Coverage = '+fmt(ebit/interest,2)+'x';
+}
+function calcA3Efficiency(){
+  const sales=num('a3-e-sales'), assets=num('a3-e-assets'), cogs=num('a3-e-cogs'), avginv=num('a3-e-avginv');
+  document.getElementById('a3-e-result').textContent =
+    'Asset Turnover = '+fmt(sales/assets,2)+'x\nInventory Turnover = '+fmt(cogs/avginv,2)+'x';
+}
+function calcA3DuPont(){
+  const ni=num('a3-dp-ni'), sales=num('a3-dp-sales'), assets=num('a3-dp-assets'), eq=num('a3-dp-equity');
+  const margin=ni/sales, turnover=sales/assets, leverage=assets/eq;
+  document.getElementById('a3-dp-result').textContent =
+    'Margin '+fmt(margin*100,2)+'%  ×  Turnover '+fmt(turnover,2)+'x  ×  Leverage '+fmt(leverage,2)+'x\n= ROE '+fmt(margin*turnover*leverage*100,2)+'%';
+}
+
+/* ============ CATEGORY B: STATISTIK & EKONOMETRIKA ============ */
+function calcB1OLS(){
+  const x=parseList('b1-x'), y=parseList('b1-y');
+  if(x.length<2 || x.length!==y.length){ document.getElementById('b1-result').textContent='Data X dan Y harus berjumlah sama, minimal 2 titik.'; return; }
+  const mx=mean(x), my=mean(y);
+  const cov=covariance(x,y), varx=sampleVariance(x);
+  const beta=cov/varx, alpha=my-beta*mx;
+  let ssres=0, sstot=0;
+  for(let i=0;i<x.length;i++){ const yhat=alpha+beta*x[i]; ssres+=Math.pow(y[i]-yhat,2); sstot+=Math.pow(y[i]-my,2); }
+  const r2=1-ssres/sstot;
+  document.getElementById('b1-result').textContent =
+    'n = '+x.length+'\nCov(X,Y) = '+fmt(cov,4)+'\nVar(X) = '+fmt(varx,4)+'\nβ = '+fmt(beta,4)+'\nα = '+fmt(alpha,4)+
+    '\nPersamaan: Ŷ = '+fmt(alpha,3)+' + '+fmt(beta,3)+'·X\nR² = '+fmt(r2,4);
+}
+function calcB2Ttest(){
+  const xbar=num('b2-xbar'), mu0=num('b2-mu0'), s=num('b2-s'), n=num('b2-n');
+  const t=(xbar-mu0)/(s/Math.sqrt(n));
+  const sig = Math.abs(t)>1.96 ? 'signifikan pada α=5% (aprox. normal, n besar)' : 'tidak signifikan pada α=5% (aprox. normal, n besar)';
+  document.getElementById('b2-result').textContent =
+    't = '+fmt(t,4)+'\nKesimpulan kasar: '+sig+'.\nBandingkan dengan t-table (df='+(n-1)+') untuk uji formal.';
+}
+function calcB3Zscore(){
+  const x=num('b3-z-x'), mu=num('b3-z-mu'), sigma=num('b3-z-sigma');
+  const z=(x-mu)/sigma, cdf=normCDF(z);
+  document.getElementById('b3-z-result').textContent =
+    'z = '+fmt(z,4)+'\nP(X ≤ '+x+') = Φ(z) = '+fmt(cdf*100,3)+'%\nP(X > '+x+') = '+fmt((1-cdf)*100,3)+'%';
+}
+function calcB3CLT(){
+  const mu=num('b3-clt-mu'), sigma=num('b3-clt-sigma'), n=num('b3-clt-n');
+  const se=sigma/Math.sqrt(n);
+  document.getElementById('b3-clt-result').textContent =
+    'X̄ₙ ~ N('+mu+', '+fmt(sigma*sigma/n,4)+')\nStandard Error = σ/√n = '+fmt(se,4);
+}
+function calcB3Descriptive(){
+  const data=parseList('b3-data');
+  if(data.length<2){ document.getElementById('b3-desc-result').textContent='Masukkan minimal 2 data.'; return; }
+  const m=mean(data), v=sampleVariance(data), sd=Math.sqrt(v), sk=skewness(data), ku=kurtosis(data);
+  document.getElementById('b3-desc-result').textContent =
+    'n = '+data.length+'\nMean = '+fmt(m,4)+'\nVariance (sampel) = '+fmt(v,4)+'\nStd Dev = '+fmt(sd,4)+
+    '\nSkewness = '+fmt(sk,4)+'\nKurtosis = '+fmt(ku,4);
+}
+function simB4RandomWalk(){
+  const s0=num('b4-rw-s0'), sigma=num('b4-rw-sigma'), n=Math.max(2,Math.round(num('b4-rw-n')));
+  let path=[s0];
+  for(let i=1;i<n;i++) path.push(path[i-1]+randn()*sigma);
+  drawPathChart('b4-rw-chart', path);
+  document.getElementById('b4-rw-result').textContent = 'S₀ = '+fmt(s0,2)+'  →  S_'+(n-1)+' (simulasi) = '+fmt(path[n-1],2);
+}
+function calcB4AR(){
+  const c=num('b4-ar-c'), phi=num('b4-ar-phi'), xprev=num('b4-ar-xprev');
+  document.getElementById('b4-ar-result').textContent = 'X_t = '+fmt(c+phi*xprev,4)+' (tanpa shock ε_t)';
+}
+function calcB4MA(){
+  const mu=num('b4-ma-mu'), theta=num('b4-ma-theta'), eprev=num('b4-ma-eprev'), enow=num('b4-ma-enow');
+  document.getElementById('b4-ma-result').textContent = 'X_t = '+fmt(mu+enow+theta*eprev,4);
+}
+function calcB4GARCH(){
+  const omega=num('b4-g-omega'), alpha=num('b4-g-alpha'), beta=num('b4-g-beta'), e2=num('b4-g-e2'), s2=num('b4-g-s2');
+  const nextVar=omega+alpha*e2+beta*s2;
+  document.getElementById('b4-g-result').textContent =
+    'σ²_t = '+nextVar.toExponential(5)+'\nσ_t = '+Math.sqrt(nextVar).toExponential(5)+'\nPersistence (α+β) = '+fmt(alpha+beta,4);
+}
+function calcB5CovCorr(){
+  const x=parseList('b5-x'), y=parseList('b5-y');
+  if(x.length<2||x.length!==y.length){ document.getElementById('b5-result').textContent='Data X dan Y harus sama panjang, minimal 2 titik.'; return; }
+  const cov=covariance(x,y), sx=sampleStdev(x), sy=sampleStdev(y);
+  document.getElementById('b5-result').textContent =
+    'Cov(X,Y) = '+fmt(cov,4)+'\nσX = '+fmt(sx,4)+'   σY = '+fmt(sy,4)+'\nρ(X,Y) = '+fmt(cov/(sx*sy),4);
+}
+
+/* ============ CATEGORY C: FIXED INCOME & TVM ============ */
+function calcC1PVDiscrete(){
+  const fv=num('c1-pvd-fv'), r=pct('c1-pvd-r'), n=num('c1-pvd-n');
+  document.getElementById('c1-pvd-result').textContent = 'PV = '+fmt(fv/Math.pow(1+r,n),2);
+}
+function calcC1FVDiscrete(){
+  const pv=num('c1-fvd-pv'), r=pct('c1-fvd-r'), n=num('c1-fvd-n');
+  document.getElementById('c1-fvd-result').textContent = 'FV = '+fmt(pv*Math.pow(1+r,n),2);
+}
+function calcC1PVCont(){
+  const fv=num('c1-pvc-fv'), r=pct('c1-pvc-r'), t=num('c1-pvc-t');
+  document.getElementById('c1-pvc-result').textContent = 'PV = '+fmt(fv*Math.exp(-r*t),2);
+}
+function calcC1FVCont(){
+  const pv=num('c1-fvc-pv'), r=pct('c1-fvc-r'), t=num('c1-fvc-t');
+  document.getElementById('c1-fvc-result').textContent = 'FV = '+fmt(pv*Math.exp(r*t),2);
+}
+function calcC1Annuity(){
+  const c=num('c1-ann-c'), r=pct('c1-ann-r'), n=num('c1-ann-n');
+  const pv = (r===0) ? c*n : c*(1-Math.pow(1+r,-n))/r;
+  document.getElementById('c1-ann-result').textContent = 'PV Annuity = '+fmt(pv,2);
+}
+function calcC1Perpetuity(){
+  const c=num('c1-perp-c'), r=pct('c1-perp-r');
+  document.getElementById('c1-perp-result').textContent = 'PV Perpetuity = '+fmt(c/r,2);
+}
+function calcC1EAR(){
+  const r=pct('c1-ear-r'), m=num('c1-ear-m');
+  document.getElementById('c1-ear-result').textContent = 'EAR = '+fmt((Math.pow(1+r/m,m)-1)*100,4)+'%';
+}
+function bondPriceCalc(F,couponPct,yPct,n){
+  const C=couponPct/100*F, y=yPct/100;
+  let P=0;
+  for(let t=1;t<=n;t++) P += C/Math.pow(1+y,t);
+  P += F/Math.pow(1+y,n);
+  return P;
+}
+function calcC2Price(){
+  const F=num('c2-p-face'), couponPct=num('c2-p-coupon'), yPct=num('c2-p-yield'), n=num('c2-p-n');
+  const P=bondPriceCalc(F,couponPct,yPct,n);
+  const cy=(couponPct/100*F)/P;
+  document.getElementById('c2-p-result').textContent = 'Harga Obligasi P = '+fmt(P,2)+'\nCurrent Yield = '+fmt(cy*100,3)+'%';
+}
+function calcC2Duration(){
+  const F=num('c2-d-face'), couponPct=num('c2-d-coupon'), yPct=num('c2-d-yield'), n=num('c2-d-n');
+  const C=couponPct/100*F, y=yPct/100;
+  let P=0, weighted=0;
+  for(let t=1;t<=n;t++){ const pvcf=C/Math.pow(1+y,t); P+=pvcf; weighted+=t*pvcf; }
+  const pvFace=F/Math.pow(1+y,n); P+=pvFace; weighted+=n*pvFace;
+  const macD=weighted/P, modD=macD/(1+y);
+  document.getElementById('c2-d-result').textContent =
+    'Harga P = '+fmt(P,2)+'\nMacaulay Duration = '+fmt(macD,4)+' tahun\nModified Duration = '+fmt(modD,4);
+}
+function calcC2DeltaP(){
+  const d=num('c2-dp-d'), dy=pct('c2-dp-dy');
+  document.getElementById('c2-dp-result').textContent = '%ΔP ≈ '+fmt(-d*dy*100,3)+'%';
+}
+function calcC2Convexity(){
+  const F=num('c2-cv-face'), couponPct=num('c2-cv-coupon'), yPct=num('c2-cv-yield'), n=num('c2-cv-n');
+  const bumpPct=0.5;
+  const P0=bondPriceCalc(F,couponPct,yPct,n);
+  const Pup=bondPriceCalc(F,couponPct,yPct+bumpPct,n);
+  const Pdown=bondPriceCalc(F,couponPct,yPct-bumpPct,n);
+  const dy=bumpPct/100;
+  const convexity=(Pup+Pdown-2*P0)/(P0*dy*dy);
+  document.getElementById('c2-cv-result').textContent =
+    'P₀ = '+fmt(P0,2)+'  P(y+50bps) = '+fmt(Pup,2)+'  P(y−50bps) = '+fmt(Pdown,2)+'\nConvexity ≈ '+fmt(convexity,3);
+}
+function calcC3Forward(){
+  const r1=pct('c3-r1'), t1=num('c3-t1'), r2=pct('c3-r2'), t2=num('c3-t2');
+  const f=Math.pow(Math.pow(1+r2,t2)/Math.pow(1+r1,t1), 1/(t2-t1))-1;
+  document.getElementById('c3-result').textContent = 'Forward rate f(t₁,t₂) = '+fmt(f*100,4)+'%';
+}
+
+/* ============ CATEGORY D: PORTOFOLIO & RISIKO ============ */
+function calcD1ExpReturn(){
+  const w1=num('d1-er-w1'), r1=num('d1-er-r1'), w2=num('d1-er-w2'), r2=num('d1-er-r2'), w3=num('d1-er-w3'), r3=num('d1-er-r3');
+  const ep=w1*r1+w2*r2+w3*r3, wsum=w1+w2+w3;
+  document.getElementById('d1-er-result').textContent =
+    'E[Rp] = '+fmt(ep,3)+'%'+(Math.abs(wsum-1)>0.001?'\n⚠ total bobot = '+fmt(wsum,3)+' (idealnya = 1)':'');
+}
+function calcD1Variance(){
+  const w1=num('d1-v-w1'), w2=num('d1-v-w2'), s1=pct('d1-v-s1'), s2=pct('d1-v-s2'), rho=num('d1-v-rho');
+  const varp=w1*w1*s1*s1+w2*w2*s2*s2+2*w1*w2*s1*s2*rho;
+  document.getElementById('d1-v-result').textContent = 'σp² = '+fmt(varp,6)+'\nσp = '+fmt(Math.sqrt(varp)*100,3)+'%';
+}
+function calcD2CAPM(){
+  const rf=num('d2-c-rf'), beta=num('d2-c-beta'), rm=num('d2-c-rm');
+  document.getElementById('d2-c-result').textContent = 'E[Ri] = '+fmt(rf+beta*(rm-rf),3)+'%';
+}
+function calcD2Beta(){
+  const cov=num('d2-b-cov'), varm=num('d2-b-var');
+  document.getElementById('d2-b-result').textContent = 'β = '+fmt(cov/varm,4);
+}
+function calcD2Alpha(){
+  const ri=num('d2-a-ri'), rf=num('d2-a-rf'), beta=num('d2-a-beta'), rm=num('d2-a-rm');
+  document.getElementById('d2-a-result').textContent = 'α = '+fmt(ri-(rf+beta*(rm-rf)),3)+'%';
+}
+function calcD3FamaFrench(){
+  const alpha=num('d3-ff-alpha'), rf=num('d3-ff-rf'), bm=num('d3-ff-bm'), rm=num('d3-ff-rm'),
+        bs=num('d3-ff-bs'), smb=num('d3-ff-smb'), bv=num('d3-ff-bv'), hml=num('d3-ff-hml');
+  const excess=alpha+bm*(rm-rf)+bs*smb+bv*hml;
+  document.getElementById('d3-ff-result').textContent = 'Ri − Rf = '+fmt(excess,3)+'%\nRi = '+fmt(excess+rf,3)+'%';
+}
+function calcD3APT(){
+  const rf=num('d3-apt-rf'), b1=num('d3-apt-b1'), l1=num('d3-apt-l1'), b2=num('d3-apt-b2'), l2=num('d3-apt-l2'), b3=num('d3-apt-b3'), l3=num('d3-apt-l3');
+  document.getElementById('d3-apt-result').textContent = 'E[Ri] = '+fmt(rf+b1*l1+b2*l2+b3*l3,3)+'%';
+}
+function calcD4Volatility(){
+  const data=parseList('d4-vol-data');
+  if(data.length<2){ document.getElementById('d4-vol-result').textContent='Masukkan minimal 2 data return.'; return; }
+  const sd=sampleStdev(data);
+  document.getElementById('d4-vol-result').textContent =
+    'σ harian = '+fmt(sd,4)+'%\nσ tahunan = σ harian × √252 = '+fmt(sd*Math.sqrt(252),3)+'%';
+}
+function calcD4VaR(){
+  const pv=num('d4-var-pv'), mu=pct('d4-var-mu'), sigma=pct('d4-var-sigma'), conf=document.getElementById('d4-var-conf').value;
+  const z=Z_TABLE[conf];
+  const varPct=z*sigma-mu, varAmount=varPct*pv;
+  const alphaTail=1-parseFloat(conf);
+  const esPct=sigma*normPDF(z)/alphaTail-mu, esAmount=esPct*pv;
+  document.getElementById('d4-var-result').textContent =
+    'VaR('+(parseFloat(conf)*100)+'%) = '+fmt(varPct*100,3)+'% ≈ '+fmt(varAmount,0)+'\nCVaR('+(parseFloat(conf)*100)+'%) = '+fmt(esPct*100,3)+'% ≈ '+fmt(esAmount,0);
+}
+function calcD4Sharpe(){
+  const rp=num('d4-sh-rp'), rf=num('d4-sh-rf'), sigma=num('d4-sh-sigma');
+  document.getElementById('d4-sh-result').textContent = 'Sharpe Ratio = '+fmt((rp-rf)/sigma,4);
+}
+function calcD5Sortino(){
+  const rp=num('d5-so-rp'), rf=num('d5-so-rf'), dd=num('d5-so-dd');
+  document.getElementById('d5-so-result').textContent = 'Sortino Ratio = '+fmt((rp-rf)/dd,4);
+}
+function calcD5IR(){
+  const alpha=num('d5-ir-alpha'), te=num('d5-ir-te');
+  document.getElementById('d5-ir-result').textContent = 'Information Ratio = '+fmt(alpha/te,4);
+}
+function calcD5MDD(){
+  const data=parseList('d5-mdd-data');
+  if(data.length<2){ document.getElementById('d5-mdd-result').textContent='Masukkan minimal 2 data.'; return; }
+  let peak=data[0], maxDD=0, peakAt=0, bestPeakIdx=0, bestTroughIdx=0;
+  for(let i=0;i<data.length;i++){
+    if(data[i]>peak){ peak=data[i]; peakAt=i; }
+    const dd=(peak-data[i])/peak;
+    if(dd>maxDD){ maxDD=dd; bestPeakIdx=peakAt; bestTroughIdx=i; }
+  }
+  document.getElementById('d5-mdd-result').textContent = 'Maximum Drawdown = '+fmt(maxDD*100,2)+'%  (indeks '+bestPeakIdx+' → '+bestTroughIdx+')';
+}
+function calcD5Calmar(){
+  const ret=num('d5-cal-ret'), mdd=num('d5-cal-mdd');
+  document.getElementById('d5-cal-result').textContent = 'Calmar Ratio = '+fmt(ret/mdd,4);
+}
+
+/* ============ CATEGORY E: FX, KOMODITAS & STOKASTIK ============ */
+function calcE1IRP(){
+  const s=num('e1-irp-s'), rd=pct('e1-irp-rd'), rf=pct('e1-irp-rf'), t=num('e1-irp-t');
+  document.getElementById('e1-irp-result').textContent = 'Forward Rate F = '+fmt(s*Math.exp((rd-rf)*t),2);
+}
+function calcE1PPP(){
+  const s0=num('e1-ppp-s0'), pid=pct('e1-ppp-pid'), pif=pct('e1-ppp-pif');
+  document.getElementById('e1-ppp-result').textContent = 'S₁ (implied) = '+fmt(s0*(1+pid)/(1+pif),2);
+}
+function calcE1Carry(){
+  const rh=num('e1-ct-rh'), rl=num('e1-ct-rl'), ds=num('e1-ct-ds');
+  document.getElementById('e1-ct-result').textContent = 'Carry Trade Return ≈ '+fmt(rh-rl-ds,3)+'%';
+}
+function calcE2Forward(){
+  const s=num('e2-fp-s'), r=pct('e2-fp-r'), u=pct('e2-fp-u'), y=pct('e2-fp-y'), t=num('e2-fp-t');
+  document.getElementById('e2-fp-result').textContent = 'Forward Price F = '+fmt(s*Math.exp((r+u-y)*t),2);
+}
+function calcE2Roll(){
+  const near=num('e2-ry-near'), far=num('e2-ry-far');
+  document.getElementById('e2-ry-result').textContent = 'Roll Yield ≈ '+fmt((near-far)/near*100,3)+'%';
+}
+function simE3Brownian(){
+  const T=num('e3-bm-t'), n=Math.max(2,Math.round(num('e3-bm-n')));
+  const dt=T/n;
+  let path=[0];
+  for(let i=1;i<=n;i++) path.push(path[i-1]+randn()*Math.sqrt(dt));
+  drawPathChart('e3-bm-chart', path);
+  document.getElementById('e3-bm-result').textContent = 'W_T (simulasi) = '+fmt(path[path.length-1],4);
+}
+function simE3GBM(){
+  const s0=num('e3-gbm-s0'), mu=pct('e3-gbm-mu'), sigma=pct('e3-gbm-sigma'), T=num('e3-gbm-t'), steps=Math.max(2,Math.round(num('e3-gbm-n')));
+  const dt=T/steps;
+  let path=[s0];
+  for(let i=1;i<=steps;i++){
+    const z=randn(), prev=path[i-1];
+    path.push(prev*Math.exp((mu-0.5*sigma*sigma)*dt+sigma*Math.sqrt(dt)*z));
+  }
+  drawPathChart('e3-gbm-chart', path);
+  document.getElementById('e3-gbm-result').textContent = 'S_T (simulasi) = '+fmt(path[path.length-1],2);
+}
+
+/* ============ TICKER & INIT ============ */
+const TICKER_ITEMS = [
+  {t:'P = Σ CF_t / (1+r+z)^t', c:''},
+  {t:'E[Rp] = Σ wᵢ E[Rᵢ]', c:'g'},
+  {t:'β = Cov(Ri,Rm) / Var(Rm)', c:''},
+  {t:'ΔP/P ≈ −D*Δy', c:'a'},
+  {t:'σ_annual = σ_daily × √252', c:''},
+  {t:'CAPM: E[Ri] = Rf + β(Rm−Rf)', c:'g'},
+  {t:'dSt = μSt dt + σSt dWt', c:''},
+  {t:'SR = (E[Rp]−Rf) / σp', c:'a'},
+  {t:'PV = FV·e^(−rt)', c:''},
+  {t:'ROE = Margin × Turnover × Leverage', c:'g'},
+  {t:'F = S·e^((rd−rf)T)', c:''},
+  {t:'R² = 1 − SSres/SStot', c:'a'},
+  {t:'VaR: P(ΔP < −VaRα) = α', c:''},
+  {t:'σt² = ω + αε²t-1 + βσ²t-1', c:'g'}
+];
+function buildTicker(){
+  const html = TICKER_ITEMS.map(function(it){ return '<span class="'+it.c+'">'+it.t+'</span>'; }).join('');
+  document.getElementById('tickerTrack').innerHTML = html+html;
+}
+function initApp(){
+  buildTicker();
+  renderCatTabs();
+  renderTopicPills();
+  showSection(currentTopic);
+  if(window.renderMathInElement){
+    renderMathInElement(document.body, {
+      delimiters: [
+        {left:'$$', right:'$$', display:true},
+        {left:'\\(', right:'\\)', display:false},
+        {left:'\\[', right:'\\]', display:true}
+      ],
+      throwOnError:false
+    });
+  }
+}
+initApp();
+</script>
+</body>
+</html>
