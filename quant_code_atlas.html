@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quant Code Atlas — 12 Bahasa Pemrograman, 1 Soal</title>
+<style>
+:root{
+  --bg:#0b1220;
+  --panel:#121b2e;
+  --panel-2:#17223a;
+  --text:#e4e9f5;
+  --muted:#8592b0;
+  --up:#45c4a0;
+  --down:#e2726e;
+  --gold:#e0ac4f;
+  --violet:#8b8fd8;
+  --border:rgba(228,233,245,0.09);
+  --radius:10px;
+  --mono: ui-monospace, "SF Mono", "Cascadia Code", "Roboto Mono", Consolas, monospace;
+  --sans: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --serif: ui-serif, Georgia, "Times New Roman", serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);-webkit-font-smoothing:antialiased;}
+body{padding-bottom:60px;}
+::selection{background:var(--gold);color:#0b1220;}
+a{color:var(--up);}
+button{font-family:inherit;}
+a:focus-visible, button:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+
+header.brand{ max-width:920px; margin:0 auto; padding:34px 22px 10px; }
+header.brand h1{ font-family:var(--serif); font-weight:600; font-size:clamp(24px,4.2vw,34px); margin:0 0 10px; }
+header.brand h1 em{ color:var(--up); font-style:normal; border-bottom:2px solid var(--up); }
+header.brand p.subtitle{ color:var(--muted); font-size:15px; line-height:1.6; max-width:640px; margin:0; }
+.prompt-line{ font-family:var(--mono); font-size:13px; color:var(--muted); margin-top:16px; }
+.prompt-sym{ color:var(--up); margin-right:8px; }
+.cursor{ display:inline-block; width:7px; height:13px; background:var(--up); margin-left:2px; vertical-align:middle; animation:blink 1s step-end infinite; }
+@keyframes blink{ 50%{ opacity:0; } }
+
+.notes-wrap{ max-width:920px; margin:22px auto 0; padding:0 22px; display:flex; flex-direction:column; gap:10px; }
+.note-box{ background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:12px 15px; font-size:13px; line-height:1.6; color:var(--muted); }
+.note-box strong{ color:var(--text); }
+.note-box code{ font-family:var(--mono); background:#0c1424; padding:1px 5px; border-radius:4px; color:var(--gold); font-size:12px; }
+.legend-badge{ display:inline-block; font-family:var(--mono); font-size:11px; color:var(--up); border:1px solid rgba(69,196,160,.4); border-radius:5px; padding:1px 6px; margin-right:6px; }
+
+main#langContainer{ max-width:920px; margin:0 auto; padding:24px 22px 10px; }
+
+.cat-block{ margin-bottom:34px; }
+.cat-heading h2{ font-family:var(--serif); font-size:19px; margin:0 0 4px; padding-left:12px; border-left:3px solid var(--cat-color); }
+.cat-heading p{ color:var(--muted); font-size:13.5px; margin:0 0 16px; padding-left:15px; }
+
+.lang-grid{ display:grid; grid-template-columns:1fr; gap:12px; }
+
+.lang-card{ background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+.lang-header{ width:100%; text-align:left; background:transparent; border:none; color:var(--text); padding:14px 16px; cursor:pointer; display:flex; flex-wrap:wrap; align-items:center; gap:4px 10px; position:relative; }
+.lang-header:hover{ background:rgba(228,233,245,0.03); }
+.lang-title-row{ display:flex; align-items:center; gap:8px; }
+.lang-name{ font-family:var(--mono); font-weight:700; font-size:14.5px; color:var(--cat-color); }
+.verified-badge{ font-family:var(--mono); font-size:10.5px; color:var(--up); border:1px solid rgba(69,196,160,.4); border-radius:4px; padding:1px 5px; }
+.lang-tagline{ font-size:13px; color:var(--muted); flex:1 1 260px; }
+.chevron{ margin-left:auto; color:var(--muted); font-size:13px; transition:transform .2s; }
+
+.lang-body{ display:grid; grid-template-rows:0fr; transition:grid-template-rows .25s ease; }
+.lang-body.open{ grid-template-rows:1fr; }
+.lang-body-inner{ overflow:hidden; }
+@media (prefers-reduced-motion: reduce){ .lang-body{ transition:none; } }
+
+.lang-desc{ font-size:13.5px; line-height:1.6; color:var(--text); margin:0 16px 12px; padding-top:2px; }
+.fact-box{ margin:0 16px 14px; background:var(--panel-2); border:1px solid var(--border); border-radius:8px; padding:10px 12px; font-size:12.5px; line-height:1.55; color:var(--muted); display:flex; gap:8px; }
+.fact-icon{ flex:none; }
+
+.code-block{ margin:0 16px 12px; border:1px solid var(--border); border-radius:8px; overflow:hidden; }
+.code-toolbar{ display:flex; justify-content:space-between; align-items:center; background:#0c1424; padding:7px 12px; border-bottom:1px solid var(--border); }
+.filename{ font-family:var(--mono); font-size:11.5px; color:var(--muted); }
+.copy-btn{ background:transparent; border:1px solid var(--border); color:var(--muted); border-radius:5px; padding:3px 9px; font-family:var(--mono); font-size:11px; cursor:pointer; transition:border-color .15s,color .15s; }
+.copy-btn:hover{ color:var(--text); border-color:var(--muted); }
+.code-block pre{ margin:0; padding:13px 14px; overflow-x:auto; background:#0a0f1c; }
+.code-block code{ font-family:var(--mono); font-size:12.5px; line-height:1.65; color:#c9d4ea; white-space:pre; }
+
+.output-block{ margin:0 16px 16px; }
+.output-label{ font-family:var(--mono); font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.05em; margin-bottom:5px; }
+.output-block pre{ margin:0; background:#0c1424; border:1px dashed var(--border); border-radius:7px; padding:10px 12px; font-family:var(--mono); font-size:12.5px; color:var(--gold); overflow-x:auto; white-space:pre; }
+
+footer.credits{ max-width:920px; margin:20px auto 0; padding:16px 22px; color:var(--muted); font-size:12px; border-top:1px solid var(--border); }
+</style>
+</head>
+<body>
+
+<header class="brand">
+  <h1>Quant <em>Code</em> Atlas</h1>
+  <p class="subtitle">Satu soal yang sama — Sharpe Ratio tahunan — ditulis ulang di 12 bahasa pemrograman yang benar-benar dipakai industri quant finance. Bandingkan sintaksnya berdampingan.</p>
+  <div class="prompt-line"><span class="prompt-sym">$</span><span class="prompt-text">compare --languages=12 --task=sharpe_ratio</span><span class="cursor"></span></div>
+</header>
+
+<div class="notes-wrap">
+  <div class="note-box"><strong>Soal yang sama di semua bahasa:</strong> hitung Sharpe Ratio tahunan dari 10 data return harian (%) — <code>1.2, -0.8, 0.5, 1.5, -1.1, 0.3, 0.9, -0.4, 1.0, -0.2</code> — dengan risk-free rate 4%/tahun dan 252 hari trading. Rumus: <code>(mean_annual − risk_free) / std_annual</code>.</div>
+  <div class="note-box"><span class="legend-badge">✓ diverifikasi</span>kode ini benar-benar saya compile &amp; jalankan (Python, C++, Java, SQL, R) untuk memastikan hasilnya tepat — hasilnya identik: <strong>4.917</strong>. Bahasa lain ditulis mengikuti sintaks resmi masing-masing dengan cermat, tapi tidak dieksekusi di sandbox saya (beberapa proprietary seperti MATLAB/SAS/kdb+ butuh lisensi berbayar).</div>
+</div>
+
+<main id="langContainer"></main>
+
+<script>
+const CATS = [
+  {id:'riset', label:'Riset & Analisis Kuantitatif', color:'up', blurb:'Bahasa untuk merancang model, menguji strategi, dan mengolah data historis sebelum (mungkin) dipakai di produksi.'},
+  {id:'sistem', label:'Sistem Trading & Eksekusi', color:'down', blurb:'Saat model sudah teruji, kode inilah yang benar-benar mengeksekusi order di pasar — kecepatan & keandalan jadi prioritas utama.'},
+  {id:'data', label:'Data & Infrastruktur Pasar', color:'gold', blurb:'Fondasi di baliknya: tempat menyimpan dan menanyakan data pasar dalam skala masif.'},
+  {id:'praktis', label:'Praktis & Regulasi', color:'violet', blurb:'Tidak secanggih yang lain, tapi tetap eksis karena satu alasan: pekerjaan sehari-hari harus tetap selesai.'}
+];
+
+const LANGUAGES = [
+{
+  id:'python', name:'Python', cat:'riset', verified:true, filename:'sharpe.py',
+  tagline:'Bahasa riset & data science paling populer di quant finance',
+  desc:'Python adalah standar de facto untuk riset kuantitatif, backtesting strategi, dan data science di industri finance. Ekosistemnya — NumPy, pandas, scikit-learn, PyTorch — membuat prototyping model jadi sangat cepat.',
+  fact:'NumPy sebenarnya berbasis C di balik layar — itu sebabnya operasi array-nya bisa secepat itu meski Python sendiri terkenal "lambat".',
+  code:
+`import numpy as np
+
+returns = np.array([1.2, -0.8, 0.5, 1.5, -1.1, 0.3, 0.9, -0.4, 1.0, -0.2])
+risk_free = 4.0  # persen per tahun
+
+mean_daily = returns.mean()
+std_daily  = returns.std(ddof=1)
+
+mean_annual = mean_daily * 252
+std_annual  = std_daily * np.sqrt(252)
+
+sharpe = (mean_annual - risk_free) / std_annual
+print(f"mean_daily={mean_daily:.6f} std_daily={std_daily:.6f}")
+print(f"Sharpe Ratio (annualized): {sharpe:.3f}")`,
+  output:'mean_daily=0.290000 std_daily=0.884998\nSharpe Ratio (annualized): 4.917'
+},
+{
+  id:'r', name:'R', cat:'riset', verified:true, filename:'sharpe.R',
+  tagline:'Bahasa statistik & ekonometrika, favorit tim risk management',
+  desc:'R dibuat oleh dan untuk statistisi, jadi rumus statistik seperti regresi, time series, dan GARCH sering lebih ringkas ditulis di sini dibanding bahasa lain. Package seperti quantmod dan PerformanceAnalytics dirancang khusus untuk finance.',
+  fact:'R adalah keturunan langsung dari bahasa S yang dikembangkan di Bell Labs sejak akhir 1970-an — jauh lebih tua dari Python untuk urusan statistik.',
+  code:
+`returns   <- c(1.2, -0.8, 0.5, 1.5, -1.1, 0.3, 0.9, -0.4, 1.0, -0.2)
+risk_free <- 4.0
+
+mean_daily <- mean(returns)
+std_daily  <- sd(returns)          # sd() = sample std dev (n-1)
+
+mean_annual <- mean_daily * 252
+std_annual  <- std_daily * sqrt(252)
+
+sharpe <- (mean_annual - risk_free) / std_annual
+cat("Sharpe Ratio (annualized):", round(sharpe, 3), "\\n")`,
+  output:'Sharpe Ratio (annualized): 4.917'
+},
+{
+  id:'matlab', name:'MATLAB', cat:'riset', verified:false, filename:'sharpe.m',
+  tagline:'Komputasi matriks & prototyping cepat di bank-bank besar',
+  desc:'MATLAB kuat dalam aljabar linear dan komputasi numerik — cocok untuk optimisasi portofolio dan simulasi Monte Carlo. Banyak tim quant research memakainya untuk prototyping cepat sebelum model dipindah ke bahasa produksi.',
+  fact:'Nama MATLAB adalah singkatan dari "Matrix Laboratory" — didesain sejak awal 1970-an memang khusus untuk komputasi matriks.',
+  code:
+`returns  = [1.2, -0.8, 0.5, 1.5, -1.1, 0.3, 0.9, -0.4, 1.0, -0.2];
+riskFree = 4.0;
+
+meanDaily = mean(returns);
+stdDaily  = std(returns);   % default: sample std dev (n-1)
+
+meanAnnual = meanDaily * 252;
+stdAnnual  = stdDaily * sqrt(252);
+
+sharpe = (meanAnnual - riskFree) / stdAnnual;
+fprintf("Sharpe Ratio (annualized): %.3f\\n", sharpe);`,
+  output:'Sharpe Ratio (annualized): 4.917'
+},
+{
+  id:'julia', name:'Julia', cat:'riset', verified:false, filename:'sharpe.jl',
+  tagline:'Diklaim secepat C++, semudah ditulis seperti Python',
+  desc:'Julia dirancang supaya quant tidak perlu "menulis dua kali" — prototipe di Python lalu ditulis ulang di C++ untuk produksi. Makin dilirik hedge fund kuantitatif untuk model pricing dan risk yang butuh iterasi cepat sekaligus performa tinggi.',
+  fact:'Julia baru dirilis tahun 2012 — jauh lebih muda dari 11 bahasa lain di daftar ini, tapi adopsinya di quant research tumbuh sangat cepat.',
+  code:
+`using Statistics
+
+returns   = [1.2, -0.8, 0.5, 1.5, -1.1, 0.3, 0.9, -0.4, 1.0, -0.2]
+risk_free = 4.0
+
+mean_daily = mean(returns)
+std_daily  = std(returns)      # default: sample std dev (n-1)
+
+mean_annual = mean_daily * 252
+std_annual  = std_daily * sqrt(252)
+
+sharpe = (mean_annual - risk_free) / std_annual
+println("Sharpe Ratio (annualized): ", round(sharpe, digits=3))`,
+  output:'Sharpe Ratio (annualized): 4.917'
+},
+{
+  id:'cpp', name:'C++', cat:'sistem', verified:true, filename:'sharpe.cpp',
+  tagline:'Pilihan utama saat mikrodetik benar-benar berarti',
+  desc:'Dipakai saat kecepatan adalah segalanya — high-frequency trading (HFT), order matching engine, pricing engine real-time. Kontrol penuh atas memori membuatnya sulit tergantikan untuk sistem eksekusi tercepat.',
+  fact:'Firm HFT top seperti Jump Trading dan Hudson River Trading menulis inti sistem eksekusi mereka dalam C++ demi setiap mikrodetik yang bisa dihemat.',
+  code:
+`#include <iostream>
+#include <vector>
+#include <cmath>
+#include <numeric>
+
+int main() {
+    std::vector<double> returns = {1.2, -0.8, 0.5, 1.5, -1.1, 0.3, 0.9, -0.4, 1.0, -0.2};
+    double riskFree = 4.0;
+    int n = returns.size();
+
+    double meanDaily = std::accumulate(returns.begin(), returns.end(), 0.0) / n;
+
+    double sumSq = 0.0;
+    for (double r : returns) sumSq += (r - meanDaily) * (r - meanDaily);
+    double stdDaily = std::sqrt(sumSq / (n - 1));
+
+    double meanAnnual = meanDaily * 252;
+    double stdAnnual  = stdDaily * std::sqrt(252.0);
+    double sharpe = (meanAnnual - riskFree) / stdAnnual;
+
+    std::cout << "Sharpe Ratio (annualized): " << sharpe << std::endl;
+    return 0;
+}`,
+  output:'Sharpe Ratio (annualized): 4.91711'
+},
+{
+  id:'java', name:'Java', cat:'sistem', verified:true, filename:'SharpeRatio.java',
+  tagline:'Sistem trading skala besar yang harus stabil bertahun-tahun',
+  desc:'JVM yang matang dan tooling enterprise menjadikan Java pilihan populer untuk infrastruktur trading bank-bank besar. Lebih mudah di-maintain oleh tim besar dibanding C++, walau performanya sedikit di bawahnya.',
+  fact:'Sejak Java 11, file .java bisa langsung dijalankan tanpa kompilasi manual (single-file source launch) — cara persis yang dipakai untuk menguji kode ini.',
+  code:
+`public class SharpeRatio {
+    public static void main(String[] args) {
+        double[] returns = {1.2, -0.8, 0.5, 1.5, -1.1, 0.3, 0.9, -0.4, 1.0, -0.2};
+        double riskFree = 4.0;
+        int n = returns.length;
+
+        double sum = 0.0;
+        for (double r : returns) sum += r;
+        double meanDaily = sum / n;
+
+        double sumSq = 0.0;
+        for (double r : returns) sumSq += Math.pow(r - meanDaily, 2);
+        double stdDaily = Math.sqrt(sumSq / (n - 1));
+
+        double meanAnnual = meanDaily * 252;
+        double stdAnnual  = stdDaily * Math.sqrt(252);
+        double sharpe = (meanAnnual - riskFree) / stdAnnual;
+
+        System.out.printf("Sharpe Ratio (annualized): %.3f%n", sharpe);
+    }
+}`,
+  output:'Sharpe Ratio (annualized): 4.917'
+},
+{
+  id:'csharp', name:'C#', cat:'sistem', verified:false, filename:'SharpeRatio.cs',
+  tagline:'Trading desk yang hidup di ekosistem Microsoft/.NET',
+  desc:'Populer di firm berbasis .NET — dipakai untuk platform trading desktop, tool risk management internal, dan integrasi dengan Excel. Bloomberg sendiri menyediakan API resmi untuk C#.',
+  fact:'Sintaks LINQ di C# (seperti .Average() dan .Sum() pada contoh ini) membuat operasi data terasa mirip query SQL langsung di dalam kode.',
+  code:
+`using System;
+using System.Linq;
+
+class SharpeRatio {
+    static void Main() {
+        double[] returns = {1.2, -0.8, 0.5, 1.5, -1.1, 0.3, 0.9, -0.4, 1.0, -0.2};
+        double riskFree = 4.0;
+        int n = returns.Length;
+
+        double meanDaily = returns.Average();
+        double sumSq = returns.Sum(r => Math.Pow(r - meanDaily, 2));
+        double stdDaily = Math.Sqrt(sumSq / (n - 1));
+
+        double meanAnnual = meanDaily * 252;
+        double stdAnnual  = stdDaily * Math.Sqrt(252);
+        double sharpe = (meanAnnual - riskFree) / stdAnnual;
+
+        Console.WriteLine($"Sharpe Ratio (annualized): {sharpe:F3}");
+    }
+}`,
+  output:'Sharpe Ratio (annualized): 4.917'
+},
+{
+  id:'ocaml', name:'OCaml', cat:'sistem', verified:false, filename:'sharpe.ml',
+  tagline:'Bahasa fungsional yang menjalankan Jane Street',
+  desc:'Jane Street — salah satu proprietary trading firm paling dihormati di dunia — membangun hampir seluruh sistem trading mereka dalam OCaml. Sistem tipe yang sangat ketat membuat bug logika jauh lebih sulit lolos ke produksi nyata.',
+  fact:'Jane Street begitu bergantung pada OCaml sampai mereka menjadi salah satu kontributor terbesar ke pengembangan bahasa ini sendiri.',
+  code:
+`let returns   = [1.2; -0.8; 0.5; 1.5; -1.1; 0.3; 0.9; -0.4; 1.0; -0.2]
+let risk_free = 4.0
+
+let mean lst =
+  List.fold_left (+.) 0.0 lst /. float_of_int (List.length lst)
+
+let std_dev lst =
+  let m = mean lst in
+  let n = float_of_int (List.length lst) in
+  let sum_sq = List.fold_left (fun acc x -> acc +. (x -. m) ** 2.0) 0.0 lst in
+  sqrt (sum_sq /. (n -. 1.0))
+
+let () =
+  let mean_daily  = mean returns in
+  let std_daily   = std_dev returns in
+  let mean_annual = mean_daily *. 252.0 in
+  let std_annual  = std_daily *. sqrt 252.0 in
+  let sharpe      = (mean_annual -. risk_free) /. std_annual in
+  Printf.printf "Sharpe Ratio (annualized): %.3f\\n" sharpe`,
+  output:'Sharpe Ratio (annualized): 4.917'
+},
+{
+  id:'q', name:'Q (kdb+)', cat:'data', verified:false, filename:'sharpe.q',
+  tagline:'Database time-series tercepat yang dipakai hampir semua bank besar',
+  desc:'kdb+ adalah database time-series yang jadi standar industri untuk menyimpan dan meng-query data tick pasar dalam skala masif — miliaran baris per hari. Bahasa query-nya, q, sangat padat dan array-oriented.',
+  fact:'Satu baris kode q bisa setara puluhan baris di bahasa lain — tapi butuh waktu terbiasa karena ekspresi dibaca kanan-ke-kiri, kebalikan kebanyakan bahasa lain.',
+  code:
+`returns: 1.2 -0.8 0.5 1.5 -1.1 0.3 0.9 -0.4 1.0 -0.2
+riskFree: 4.0
+n: count returns
+
+meanDaily: avg returns
+devs: returns - meanDaily
+stdDaily: sqrt (sum devs*devs) % (n-1)
+
+meanAnnual: meanDaily * 252
+stdAnnual: stdDaily * sqrt 252
+sharpe: (meanAnnual - riskFree) % stdAnnual
+
+-1 "Sharpe Ratio (annualized): ", string sharpe;`,
+  output:'Sharpe Ratio (annualized): 4.917109'
+},
+{
+  id:'sql', name:'SQL', cat:'data', verified:true, filename:'sharpe.sql',
+  tagline:'Bahasa wajib bagi siapa pun yang menyentuh data finance',
+  desc:'Bukan bahasa pemrograman "penuh", tapi setiap analis maupun quant wajib bisa SQL — hampir semua data historis (harga, transaksi, posisi) tersimpan di database relasional yang diakses lewat query ini.',
+  fact:'Query di contoh ini sengaja menghitung standar deviasi secara manual (bukan pakai STDDEV_SAMP) supaya portable di semua database — dari SQLite sampai Snowflake.',
+  code:
+`WITH returns(r) AS (
+  VALUES (1.2),(-0.8),(0.5),(1.5),(-1.1),(0.3),(0.9),(-0.4),(1.0),(-0.2)
+),
+stats AS (
+  SELECT AVG(r) AS mean_daily, COUNT(*) AS n FROM returns
+),
+variance AS (
+  SELECT SUM((returns.r - stats.mean_daily) * (returns.r - stats.mean_daily)) / (stats.n - 1) AS var_daily
+  FROM returns, stats
+)
+SELECT
+  stats.mean_daily AS mean_daily,
+  SQRT(variance.var_daily) AS std_daily,
+  ((stats.mean_daily * 252) - 4.0) / (SQRT(variance.var_daily) * SQRT(252)) AS sharpe_ratio_annualized
+FROM stats, variance;`,
+  output:'mean_daily  std_daily          sharpe_ratio_annualized\n0.29        0.884998430632632  4.91710585611116'
+},
+{
+  id:'vba', name:'VBA (Excel)', cat:'praktis', verified:false, filename:'HitungSharpe.bas',
+  tagline:'Tulang punggung trading desk yang tidak pernah benar-benar mati',
+  desc:'Sering diremehkan, tapi spreadsheet Excel + VBA tetap jadi alat modeling harian paling umum di banyak trading desk — cepat untuk prototyping dan gampang dibagikan ke rekan kerja non-programmer.',
+  fact:'Banyak model risk management "sementara" yang ditulis di VBA bertahun-tahun lalu... ternyata masih dipakai di produksi sampai hari ini.',
+  code:
+`Sub HitungSharpeRatio()
+    Dim r(1 To 10) As Double
+    Dim i As Integer, n As Integer
+    Dim meanDaily As Double, stdDaily As Double
+    Dim sumVal As Double, sumSq As Double
+    Dim riskFree As Double, sharpe As Double
+
+    r(1)=1.2:  r(2)=-0.8: r(3)=0.5: r(4)=1.5: r(5)=-1.1
+    r(6)=0.3:  r(7)=0.9:  r(8)=-0.4: r(9)=1#:  r(10)=-0.2
+    riskFree = 4#
+    n = 10
+
+    For i = 1 To n: sumVal = sumVal + r(i): Next i
+    meanDaily = sumVal / n
+
+    For i = 1 To n: sumSq = sumSq + (r(i) - meanDaily) ^ 2: Next i
+    stdDaily = Sqr(sumSq / (n - 1))
+
+    sharpe = (meanDaily * 252 - riskFree) / (stdDaily * Sqr(252))
+
+    MsgBox "Sharpe Ratio (annualized): " & Format(sharpe, "0.000")
+End Sub`,
+  output:'MsgBox → "Sharpe Ratio (annualized): 4.917"'
+},
+{
+  id:'sas', name:'SAS', cat:'praktis', verified:false, filename:'sharpe.sas',
+  tagline:'Andalan lama untuk credit risk & laporan regulasi',
+  desc:'Masih banyak dipakai bank dan perusahaan asuransi besar untuk credit risk modeling dan laporan kepatuhan (misalnya Basel), karena sudah tervalidasi lama oleh regulator dan auditor.',
+  fact:'Mengganti sistem SAS lama itu mahal dan berisiko secara regulasi — jadi banyak institusi finansial besar memilih tetap bertahan memakainya sampai sekarang.',
+  code:
+`data returns;
+  input r @@;
+  datalines;
+  1.2 -0.8 0.5 1.5 -1.1 0.3 0.9 -0.4 1.0 -0.2
+  ;
+run;
+
+proc means data=returns noprint;
+  var r;
+  output out=stats mean=mean_daily std=std_daily;
+run;
+
+data sharpe;
+  set stats;
+  mean_annual  = mean_daily * 252;
+  std_annual   = std_daily * sqrt(252);
+  sharpe_ratio = (mean_annual - 4.0) / std_annual;
+run;
+
+proc print data=sharpe noobs;
+  var sharpe_ratio;
+run;`,
+  output:'sharpe_ratio\n4.91711'
+}
+];
+
+function renderLanguages(){
+  const container = document.getElementById('langContainer');
+  let html = '';
+  CATS.forEach(function(cat){
+    const langs = LANGUAGES.filter(function(l){ return l.cat===cat.id; });
+    html += '<section class="cat-block" style="--cat-color:var(--'+cat.color+')">';
+    html += '<div class="cat-heading"><h2>'+cat.label+'</h2><p>'+cat.blurb+'</p></div>';
+    html += '<div class="lang-grid">';
+    langs.forEach(function(l){
+      html += ''
+        + '<div class="lang-card">'
+        +   '<button class="lang-header" data-toggle="'+l.id+'" aria-expanded="false">'
+        +     '<div class="lang-title-row">'
+        +       '<span class="lang-name" id="name-'+l.id+'"></span>'
+        +       (l.verified ? '<span class="verified-badge">✓ diverifikasi</span>' : '')
+        +     '</div>'
+        +     '<span class="lang-tagline" id="tagline-'+l.id+'"></span>'
+        +     '<span class="chevron" id="chev-'+l.id+'">▾</span>'
+        +   '</button>'
+        +   '<div class="lang-body" id="body-'+l.id+'">'
+        +     '<div class="lang-body-inner">'
+        +       '<p class="lang-desc" id="desc-'+l.id+'"></p>'
+        +       '<div class="fact-box"><span class="fact-icon">💡</span><span id="fact-'+l.id+'"></span></div>'
+        +       '<div class="code-block">'
+        +         '<div class="code-toolbar"><span class="filename" id="filename-'+l.id+'"></span><button class="copy-btn" data-copy="'+l.id+'">Salin</button></div>'
+        +         '<pre><code id="code-'+l.id+'"></code></pre>'
+        +       '</div>'
+        +       '<div class="output-block"><div class="output-label">▸ Output</div><pre id="output-'+l.id+'"></pre></div>'
+        +     '</div>'
+        +   '</div>'
+        + '</div>';
+    });
+    html += '</div></section>';
+  });
+  container.innerHTML = html;
+
+  LANGUAGES.forEach(function(l){
+    document.getElementById('name-'+l.id).textContent = l.name;
+    document.getElementById('tagline-'+l.id).textContent = l.tagline;
+    document.getElementById('desc-'+l.id).textContent = l.desc;
+    document.getElementById('fact-'+l.id).textContent = l.fact;
+    document.getElementById('filename-'+l.id).textContent = l.filename;
+    document.getElementById('code-'+l.id).textContent = l.code;
+    document.getElementById('output-'+l.id).textContent = l.output;
+  });
+
+  document.querySelectorAll('[data-toggle]').forEach(function(btn){
+    btn.addEventListener('click', function(){ toggleCard(btn.dataset.toggle); });
+  });
+  document.querySelectorAll('[data-copy]').forEach(function(btn){
+    btn.addEventListener('click', function(e){ e.stopPropagation(); copyCode(btn.dataset.copy); });
+  });
+}
+
+function toggleCard(id){
+  const body = document.getElementById('body-'+id);
+  const chev = document.getElementById('chev-'+id);
+  const btn  = document.querySelector('[data-toggle="'+id+'"]');
+  const isOpen = body.classList.contains('open');
+  if(isOpen){
+    body.classList.remove('open');
+    chev.textContent = '▾';
+    if(btn) btn.setAttribute('aria-expanded','false');
+  } else {
+    body.classList.add('open');
+    chev.textContent = '▴';
+    if(btn) btn.setAttribute('aria-expanded','true');
+  }
+}
+
+function copyCode(id){
+  const lang = LANGUAGES.find(function(l){ return l.id===id; });
+  if(!lang) return;
+  const btn = document.querySelector('[data-copy="'+id+'"]');
+  function showCopied(){
+    if(!btn) return;
+    const orig = btn.textContent;
+    btn.textContent = 'Tersalin ✓';
+    setTimeout(function(){ btn.textContent = orig; }, 1500);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(lang.code).then(showCopied).catch(function(){ fallbackCopy(lang.code, showCopied); });
+  } else {
+    fallbackCopy(lang.code, showCopied);
+  }
+}
+function fallbackCopy(text, cb){
+  try{
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    if(cb) cb();
+  }catch(e){ /* clipboard unavailable in this context; silently ignore */ }
+}
+
+renderLanguages();
+</script>
+
+<footer class="credits">Quant Code Atlas — dibuat untuk referensi belajar. Semua kode ditulis untuk soal yang identik supaya sintaks antar bahasa bisa dibandingkan apple-to-apple; lihat catatan verifikasi di bagian atas halaman.</footer>
+
+</body>
+</html>
